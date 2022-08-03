@@ -1,3 +1,4 @@
+import 'package:anne_bebek/LogIn.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -33,6 +34,8 @@ class _ProfileState extends State<Profile> {
               backgroundColor: MaterialStateProperty.all(Colors.transparent)),
           onPressed: () {
             FirebaseAuth.instance.signOut();
+            Navigator.push(
+                context, MaterialPageRoute(builder: (route) => LogIn()));
           },
         ),
       ),

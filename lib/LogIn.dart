@@ -1,3 +1,4 @@
+import 'package:anne_bebek/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,7 @@ class _LogInState extends State<LogIn> {
       print(e);
     }
     Navigator.of(context, rootNavigator: true).pop();
+    Navigator.push(context, MaterialPageRoute(builder: (route) => MyApp()));
   }
 
   TapGestureRecognizer goToForgotPassword() {
@@ -88,8 +90,6 @@ class _LogInState extends State<LogIn> {
                       top: 40.0,
                     ),
                     child: SizedBox(
-                      width: 72,
-                      height: 24,
                       child: Text(
                         "Merhaba",
                         style: TextStyle(
@@ -104,8 +104,6 @@ class _LogInState extends State<LogIn> {
                       bottom: 35,
                     ),
                     child: SizedBox(
-                      width: 110,
-                      height: 30,
                       child: Text(
                         "Hoş Geldin",
                         style: TextStyle(
@@ -269,9 +267,8 @@ class _LogInState extends State<LogIn> {
                       bottom: 40,
                     ),
                     child: SizedBox(
-                      width: 246,
-                      height: 35,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             textAlign: TextAlign.center,

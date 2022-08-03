@@ -21,6 +21,11 @@ class _MainPageState extends State<MainPage> {
   List<Item> newsList = [];
   List<Person> personList = [];
 
+  List<Makale> makaleFilterList = [];
+  List<VideoItem> videoFilterList = [];
+
+  bool isFilter = false;
+
   List<Makale> makaleList = [];
 
   void signOut() {
@@ -29,7 +34,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void initState() {
-    getName();
+    //getName();
     getItems();
     getMakale();
     getVideo();
@@ -98,8 +103,7 @@ class _MainPageState extends State<MainPage> {
         makaleList.add(Makale(
             snapshot.key.toString(),
             snapshot.child("title").value.toString(),
-            snapshot.child("text").value.toString(),
-            snapshot.child("image").value.toString()));
+            snapshot.child("text").value.toString()));
       }
     });
   }
@@ -240,8 +244,13 @@ class _MainPageState extends State<MainPage> {
   Future<void> goToVideoPage(VideoItem item) async {
     DatabaseReference ref = FirebaseDatabase.instance.ref("Videolar");
     var snapshot = await ref.child(item.id).child("view").get();
-
-    ref.child(item.id).update({"view": (snapshot.value as int) + 1});
+    try {
+      ref
+          .child(item.id)
+          .update({"view": int.parse(snapshot.value.toString()) + 1});
+    } catch (e) {
+      print(e);
+    }
 
     Navigator.push(
         context,
@@ -277,7 +286,7 @@ class _MainPageState extends State<MainPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
             Text(
@@ -331,6 +340,30 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  void filter(String text) {
+    videoFilterList = [];
+    makaleFilterList = [];
+    if (text != null && text != "") {
+      isFilter = true;
+      for (Makale m in makaleList) {
+        if (m.title.toUpperCase().contains(text.toUpperCase())) {
+          makaleFilterList.add(m);
+        }
+      }
+
+      for (VideoItem v in videoItemList) {
+        if (v.title.toUpperCase().contains(text.toUpperCase())) {
+          videoFilterList.add(v);
+        }
+      }
+    } else {
+      isFilter = false;
+      videoFilterList = [];
+      makaleFilterList = [];
+    }
+    setState(() {});
+  }
+
   Widget videoItemWidget(VideoItem item) {
     return GestureDetector(
       onTap: () => goToVideoPage(item),
@@ -341,14 +374,6 @@ class _MainPageState extends State<MainPage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -357,10 +382,10 @@ class _MainPageState extends State<MainPage> {
               width: 300,
               height: 90,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(10),
-                      topLeft: Radius.circular(10)),
-                  color: Color(0xff92A3FD)),
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(10),
+                    topLeft: Radius.circular(10)),
+              ),
               child: Image.asset(
                 'images/video_banner.png',
               ),
@@ -567,72 +592,510 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      /*BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        notchMargin: 0,
-        child: Container(
-          width: double.infinity,
-          height: 80,
-          padding: EdgeInsets.only(left: 20, right: 20),
+  Widget withFilter() {
+    return Column(
+      children: [
+        Container(
+          alignment: Alignment.centerLeft,
+          margin: EdgeInsets.only(top: 43, left: 20),
           child: Row(
             children: [
-              GestureDetector(
-                  onTap: () {}, child: Image.asset("images/home.png")),
-              Spacer(),
-              GestureDetector(
-                  onTap: () {}, child: Image.asset("images/activity.png")),
-              Spacer(),
-              Spacer(),
-              GestureDetector(
-                  onTap: () {}, child: Image.asset("images/camera.png")),
-              Spacer(),
-              GestureDetector(
-                  onTap: () {}, child: Image.asset("images/profile.png")),
+              Text(
+                "Makaleler",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              )
             ],
           ),
         ),
-      ),*/
+        makaleFilterList.length == 0
+            ? Padding(
+                padding: const EdgeInsets.all(20),
+                child: Center(
+                  child: Text("Aramanızla eşleşen bir makale bulunamadı."),
+                ),
+              )
+            : Container(
+                alignment: Alignment.topCenter,
+                width: double.infinity,
+                child: ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: makaleFilterList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return item1Widget(makaleList[index]);
+                  },
+                ),
+              ),
+        Container(
+          alignment: Alignment.centerLeft,
+          margin: EdgeInsets.only(top: 43, left: 20),
+          child: Row(
+            children: [
+              Text(
+                "Videolar",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
+        ),
+        videoFilterList.length == 0
+            ? Padding(
+                padding: const EdgeInsets.all(20),
+                child: Center(
+                  child: Text("Aramanızla eşleşen bir video bulunamadı."),
+                ),
+              )
+            : Container(
+                alignment: Alignment.topCenter,
+                width: double.infinity,
+                child: ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: videoFilterList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return videoItemWidget2(videoFilterList[index]);
+                  },
+                ),
+              )
+      ],
+    );
+  }
 
-      /*BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-        items: [
-          BottomNavigationBarItem(
-              icon: Image.asset("images/home.png"), label: ""),
-          BottomNavigationBarItem(
-              icon: Image.asset("images/activity.png"), label: ""),
-          BottomNavigationBarItem(
-              icon: Image.asset("images/camera.png"), label: ""),
-          BottomNavigationBarItem(
-              icon: Image.asset("images/profile.png"), label: ""),
-        ],
-      ),*/
-
-      /*Container(
+  Widget videoItemWidget2(VideoItem item) {
+    return GestureDetector(
+      onTap: () => goToVideoPage(item),
+      child: Container(
         width: double.infinity,
-        height: 80,
-        padding: EdgeInsets.only(left: 20, right: 20),
+        height: 120,
         child: Row(
           children: [
-            GestureDetector(
-                onTap: () {}, child: Image.asset("images/home.png")),
-            Spacer(),
-            GestureDetector(
-                onTap: () {}, child: Image.asset("images/activity.png")),
-            Spacer(),
-            Spacer(),
-            GestureDetector(
-                onTap: () {}, child: Image.asset("images/camera.png")),
-            Spacer(),
-            GestureDetector(
-                onTap: () {}, child: Image.asset("images/profile.png")),
+            Container(
+              padding: EdgeInsets.only(left: 10),
+              width: MediaQuery.of(context).size.width * 0.3,
+              child: Image.asset("images/square_banner_video.png"),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 20),
+              width: MediaQuery.of(context).size.width * 0.7,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    maxLines: 2,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    item.writer,
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                  Text(
+                    item.view.toString() + " görüntü - 1 hafta önce",
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  )
+                ],
+              ),
+            ),
           ],
         ),
-      ),*/
+      ),
+    );
+  }
+
+  Widget noFilter() {
+    return Column(children: [
+      Container(
+        alignment: Alignment.centerLeft,
+        margin: EdgeInsets.only(
+          top: 43,
+          left: 20,
+        ),
+        child: Text(
+          "En Çok Görüntülenen İçerikler",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ),
+      Container(
+        width: double.infinity,
+        height: 250,
+        child: GridView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemCount: makaleList.isEmpty ? 0 : 3,
+          itemBuilder: (BuildContext context, int index) {
+            if (index % 2 == 0) {
+              return itemWidget(
+                  makaleList[index],
+                  LinearGradient(
+                    begin: Alignment(-0.95, 0.0),
+                    end: Alignment(1.0, 0.0),
+                    colors: [
+                      const Color(0xff92A3FD).withOpacity(0.2),
+                      const Color(0xff9DCEFF).withOpacity(0.2),
+                    ],
+                    stops: [0.0, 1.0],
+                  ));
+            } else {
+              return itemWidget(
+                  makaleList[index],
+                  LinearGradient(
+                    begin: Alignment(-0.95, 0.0),
+                    end: Alignment(1.0, 0.0),
+                    colors: [
+                      const Color(0xffC58BF2).withOpacity(0.2),
+                      const Color(0xffEEA4CE).withOpacity(0.2),
+                    ],
+                    stops: [0.0, 1.0],
+                  ));
+            }
+          },
+          gridDelegate:
+              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
+        ),
+      ),
+      Container(
+        alignment: Alignment.centerLeft,
+        margin: EdgeInsets.only(top: 43, left: 20, right: 10),
+        child: Row(
+          children: [
+            Text(
+              "Yeni eklenen yazılar",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            Spacer(),
+            GestureDetector(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (route) => Makaleler(makaleList: makaleList))),
+              child: Text(
+                "hepsi",
+                style: TextStyle(color: Color(0xffF2994A)),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: Color(0xffF2994A),
+            )
+          ],
+        ),
+      ),
+      Container(
+        alignment: Alignment.topCenter,
+        width: double.infinity,
+        child: ListView.builder(
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: makaleList.isEmpty ? 0 : 2,
+          itemBuilder: (BuildContext context, int index) {
+            return item1Widget(makaleList[makaleList.length - 1 - index]);
+          },
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Container(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height * 0.25,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment(-0.95, 0.0),
+              end: Alignment(1.0, 0.0),
+              colors: [
+                const Color(0xff9DCEFF).withOpacity(0.2),
+                const Color(0xff92A3FD).withOpacity(0.2),
+              ],
+              stops: [0.0, 1.0],
+            ),
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                height: double.infinity,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.all(3),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Uzmanlarımız",
+                          style: TextStyle(
+                            fontSize: 18,
+                            //fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: Text(
+                            "Sohbet İçin Hazır!",
+                            style: TextStyle(
+                              fontSize: 18, color: Color(0xff92A3FD),
+                              //fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 20,
+                          ),
+                          child: Container(
+                            width: 95,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(99.0),
+                              gradient: LinearGradient(
+                                begin: Alignment(-0.95, 0.0),
+                                end: Alignment(1.0, 0.0),
+                                colors: [
+                                  const Color(0xff92A3FD),
+                                  const Color(0xff9DCEFF),
+                                ],
+                                stops: [0.0, 1.0],
+                              ),
+                            ),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                primary: Colors.transparent,
+                                onSurface: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                              ),
+                              onPressed: () {},
+                              child: Center(
+                                child: Text(
+                                  'Daha fazla',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: const Color(0xffffffff),
+                                    letterSpacing: -0.3858822937011719,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Spacer(),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.4,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Image.asset('images/girl_banner.png'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      //Buradan
+      Container(
+        width: double.infinity,
+        height: 250,
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(32),
+          color: Color(0xffCCAFFF).withOpacity(0.15),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Image.asset(
+                  "images/ozge_karakaya_suzan.png",
+                  width: 100,
+                  height: 100,
+                ),
+                Spacer(),
+                Container(
+                  alignment: Alignment.topRight,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.star,
+                        color: Color(0xffF8D048),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(right: 20),
+                        child: Text("4.5"),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+            Spacer(),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Özge Karakaya Suzan",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+            ),
+            Spacer(),
+            Spacer(),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Arş.Görevlisi",
+                style:
+                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Spacer(),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Uzman Hemşire",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            Spacer(),
+            Spacer(),
+            Container(
+              height: 60,
+              child: Align(
+                  child: Row(children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 20,
+                  ),
+                  child: Container(
+                    width: 150,
+                    height: 34,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(99.0),
+                        color: Color(0xffCCAFFF)),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        primary: Colors.transparent,
+                        onSurface: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                      ),
+                      onPressed: () {},
+                      child: Center(
+                        child: Text(
+                          'Şimdi Sor',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: const Color(0xffffffff),
+                            letterSpacing: -0.3858822937011719,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Spacer(),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Image.asset("images/vector.png"),
+                  ),
+                ),
+              ])),
+            ),
+          ],
+        ),
+      ),
+      //Buraya
+      /*Container(
+                width: double.infinity,
+                height: 230,
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: personList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (index % 2 == 0) {
+                      return personWidget(personList[index],
+                          Color(0xffCCAFFF).withOpacity(0.15), false);
+                    } else {
+                      return personWidget(
+                          personList[index], Color(0xffFFFFFF), true);
+                    }
+                  },
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1),
+                ),
+              ),*/
+      Container(
+        alignment: Alignment.centerLeft,
+        margin: EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Text(
+              "Videolar",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Spacer(),
+            GestureDetector(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (route) => Videolar(
+                            videoItemList: videoItemList,
+                          ))),
+              child: Text(
+                "hepsi",
+                style: TextStyle(color: Color(0xffF2994A)),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: Color(0xffF2994A),
+            )
+          ],
+        ),
+      ),
+      Container(
+        width: double.infinity,
+        height: 200,
+        child: GridView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemCount: videoItemList.length == 0 ? 0 : 3,
+          itemBuilder: (BuildContext context, int index) {
+            return videoItemWidget(videoItemList[index]);
+          },
+          gridDelegate:
+              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
+        ),
+      )
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
       body: SingleChildScrollView(
         child: Container(
           color: Colors.white,
@@ -664,6 +1127,9 @@ class _MainPageState extends State<MainPage> {
               Container(
                 margin: EdgeInsets.only(top: 34, left: 20, right: 20),
                 child: TextField(
+                  onChanged: (text) {
+                    filter(text);
+                  },
                   decoration: InputDecoration(
                     labelStyle: TextStyle(
                       color: Color(0xFF898182),
@@ -679,276 +1145,7 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
               ),
-              //searchbar
-              Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.only(
-                  top: 43,
-                  left: 20,
-                ),
-                child: Text(
-                  "En Çok Görüntülenen İçerikler",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              //TEXT
-              Container(
-                width: double.infinity,
-                height: 250,
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: makaleList.isEmpty ? 0 : 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index % 2 == 0) {
-                      return itemWidget(
-                          makaleList[index],
-                          LinearGradient(
-                            begin: Alignment(-0.95, 0.0),
-                            end: Alignment(1.0, 0.0),
-                            colors: [
-                              const Color(0xff92A3FD).withOpacity(0.2),
-                              const Color(0xff9DCEFF).withOpacity(0.2),
-                            ],
-                            stops: [0.0, 1.0],
-                          ));
-                    } else {
-                      return itemWidget(
-                          makaleList[index],
-                          LinearGradient(
-                            begin: Alignment(-0.95, 0.0),
-                            end: Alignment(1.0, 0.0),
-                            colors: [
-                              const Color(0xffC58BF2).withOpacity(0.2),
-                              const Color(0xffEEA4CE).withOpacity(0.2),
-                            ],
-                            stops: [0.0, 1.0],
-                          ));
-                    }
-                  },
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1),
-                ),
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.only(top: 43, left: 20, right: 10),
-                child: Row(
-                  children: [
-                    Text(
-                      "Yeni eklenen yazılar",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Spacer(),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (route) =>
-                                  Makaleler(makaleList: makaleList))),
-                      child: Text(
-                        "hepsi",
-                        style: TextStyle(color: Color(0xffF2994A)),
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: 20,
-                      color: Color(0xffF2994A),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                alignment: Alignment.topCenter,
-                width: double.infinity,
-                child: ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: makaleList.isEmpty ? 0 : 2,
-                  itemBuilder: (BuildContext context, int index) {
-                    return item1Widget(
-                        makaleList[makaleList.length - 1 - index]);
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.2,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment(-0.95, 0.0),
-                      end: Alignment(1.0, 0.0),
-                      colors: [
-                        const Color(0xff9DCEFF).withOpacity(0.2),
-                        const Color(0xff92A3FD).withOpacity(0.2),
-                      ],
-                      stops: [0.0, 1.0],
-                    ),
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        height: double.infinity,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: const EdgeInsets.all(3),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 23.0),
-                                  child: Text(
-                                    "Uzmanlarımız",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      //fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 10.0),
-                                  child: Text(
-                                    "Sohbet İçin Hazır!",
-                                    style: TextStyle(
-                                      fontSize: 18, color: Color(0xff92A3FD),
-                                      //fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 20,
-                                  ),
-                                  child: Container(
-                                    width: 95,
-                                    height: 35,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(99.0),
-                                      gradient: LinearGradient(
-                                        begin: Alignment(-0.95, 0.0),
-                                        end: Alignment(1.0, 0.0),
-                                        colors: [
-                                          const Color(0xff92A3FD),
-                                          const Color(0xff9DCEFF),
-                                        ],
-                                        stops: [0.0, 1.0],
-                                      ),
-                                    ),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        elevation: 0,
-                                        primary: Colors.transparent,
-                                        onSurface: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                      ),
-                                      onPressed: () {},
-                                      child: Center(
-                                        child: Text(
-                                          'Daha fazla',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: const Color(0xffffffff),
-                                            letterSpacing: -0.3858822937011719,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Spacer(),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Image.asset('images/girl_banner.png'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 230,
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: personList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index % 2 == 0) {
-                      return personWidget(personList[index],
-                          Color(0xffCCAFFF).withOpacity(0.15), false);
-                    } else {
-                      return personWidget(
-                          personList[index], Color(0xffFFFFFF), true);
-                    }
-                  },
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1),
-                ),
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.all(10),
-                child: Row(
-                  children: [
-                    Text(
-                      "Videolar",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Spacer(),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (route) => Videolar(
-                                    videoItemList: videoItemList,
-                                  ))),
-                      child: Text(
-                        "hepsi",
-                        style: TextStyle(color: Color(0xffF2994A)),
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: 20,
-                      color: Color(0xffF2994A),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 200,
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: videoItemList.length == 0 ? 0 : 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    return videoItemWidget(videoItemList[index]);
-                  },
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1),
-                ),
-              ),
+              isFilter ? withFilter() : noFilter()
             ],
           ),
         ),
@@ -980,7 +1177,7 @@ class VideoItem {
 }
 
 class Makale {
-  final String title, text, image, id;
+  final String title, text, id;
 
-  Makale(this.id, this.title, this.text, this.image);
+  Makale(this.id, this.title, this.text);
 }

@@ -164,152 +164,149 @@ class _VideoPageState extends State<VideoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: 30),
-                width: double.infinity,
-                height: 60,
-                child: Row(
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.1,
-                      child: IconButton(
-                        icon: Icon(Icons.arrow_back),
-                        onPressed: () => Navigator.of(context).pop(true),
-                      ),
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 30),
+              width: double.infinity,
+              height: 60,
+              child: Row(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.1,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: () => Navigator.of(context).pop(true),
                     ),
-                    Spacer(),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.6,
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 5),
-                              child: Image.asset(
-                                "images/ozge_karakaya_suzan.png",
-                                fit: BoxFit.contain,
-                              ),
+                  ),
+                  Spacer(),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 5),
+                            child: Image.asset(
+                              "images/ozge_karakaya_suzan.png",
+                              fit: BoxFit.contain,
                             ),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(360),
-                                color: Colors.pinkAccent),
                           ),
-                          Spacer(),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Özge Karakaya Suzan"),
-                              Text(
-                                "Uzman Hemşire",
-                                style: TextStyle(color: Colors.grey),
-                              )
-                            ],
-                          ),
-                          Spacer(),
-                        ],
-                      ),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(360),
+                              color: Colors.pinkAccent),
+                        ),
+                        Spacer(),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Özge Karakaya Suzan"),
+                            Text(
+                              "Uzman Hemşire",
+                              style: TextStyle(color: Colors.grey),
+                            )
+                          ],
+                        ),
+                        Spacer(),
+                      ],
                     ),
-                    Spacer(),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.1,
-                      child: Image.asset("images/kalp.png"),
-                    ),
-                  ],
-                ),
+                  ),
+                  Spacer(),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.1,
+                    child: Image.asset("images/kalp.png"),
+                  ),
+                ],
               ),
-              Container(
-                child: Column(
-                  children: [
-                    _controller.value.isInitialized
-                        ? Container(
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            child: AspectRatio(
-                              aspectRatio: _controller.value.aspectRatio,
-                              child: VideoPlayer(_controller),
-                            ),
-                          )
-                        : Container(
-                            child: CircularProgressIndicator(),
+            ),
+            Container(
+              child: Column(
+                children: [
+                  _controller.value.isInitialized
+                      ? Container(
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          child: AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: VideoPlayer(_controller),
                           ),
-                    Container(
-                      color: Color(0xff92a3fd),
-                      width: double.infinity,
-                      height: 50,
-                      child: Row(
-                        children: [
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _controller.value.isPlaying
-                                      ? _controller.pause()
-                                      : _controller.play();
-                                });
-                              },
-                              icon: Icon(
+                        )
+                      : Container(
+                          child: CircularProgressIndicator(),
+                        ),
+                  Container(
+                    color: Color(0xff92a3fd),
+                    width: double.infinity,
+                    height: 50,
+                    child: Row(
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
                                 _controller.value.isPlaying
-                                    ? Icons.pause
-                                    : Icons.play_arrow,
-                                color: Colors.white,
-                              ))
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                                    ? _controller.pause()
+                                    : _controller.play();
+                              });
+                            },
+                            icon: Icon(
+                              _controller.value.isPlaying
+                                  ? Icons.pause
+                                  : Icons.play_arrow,
+                              color: Colors.white,
+                            ))
+                      ],
+                    ),
+                  )
+                ],
               ),
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(left: 10, top: 30),
-                child: Text(
-                  widget.item.title,
-                  style: TextStyle(fontSize: 20),
-                ),
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(left: 10, top: 30),
+              child: Text(
+                widget.item.title,
+                style: TextStyle(fontSize: 20),
               ),
-              Container(
-                padding: EdgeInsets.only(left: 10, top: 30),
-                child: Row(
-                  children: [
-                    Image.asset("images/goz.png"),
-                    Text(
-                      "  " + widget.item.view.toString() + " görüntülenme",
-                      style: TextStyle(color: Colors.grey),
-                    )
-                  ],
-                ),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 10, top: 30),
+              child: Row(
+                children: [
+                  Image.asset("images/goz.png"),
+                  Text(
+                    "  " + widget.item.view.toString() + " görüntülenme",
+                    style: TextStyle(color: Colors.grey),
+                  )
+                ],
               ),
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(left: 10, top: 20),
-                child: Text(
-                  "Benzer İçerikler",
-                  style: TextStyle(fontSize: 16),
-                ),
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(left: 10, top: 20),
+              child: Text(
+                "Benzer İçerikler",
+                style: TextStyle(fontSize: 16),
               ),
-              Container(
-                width: double.infinity,
-                height: 200,
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 2,
-                  itemBuilder: (BuildContext context, int index) {
-                    return videoItemWidget(videoList[index]);
-                  },
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1),
-                ),
-              )
-            ],
-          ),
+            ),
+            Container(
+              width: double.infinity,
+              height: 200,
+              child: GridView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: 2,
+                itemBuilder: (BuildContext context, int index) {
+                  return videoItemWidget(videoList[index]);
+                },
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1),
+              ),
+            )
+          ],
         ),
       ),
     );

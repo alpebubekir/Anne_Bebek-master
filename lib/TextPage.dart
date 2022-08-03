@@ -253,7 +253,8 @@ class _TextPageState extends State<TextPage> {
                 Container(
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: NetworkImage(widget.item.image),
+                          image:
+                              AssetImage("images/" + widget.item.id + ".jpg"),
                           fit: BoxFit.cover)),
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.5,

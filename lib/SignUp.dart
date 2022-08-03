@@ -124,8 +124,6 @@ class _SignUpState extends State<SignUp> {
                             top: 40.0,
                           ),
                           child: SizedBox(
-                            width: 72,
-                            height: 24,
                             child: Text(
                               "Merhaba",
                               style: TextStyle(
@@ -140,8 +138,6 @@ class _SignUpState extends State<SignUp> {
                             bottom: 29,
                           ),
                           child: SizedBox(
-                            width: 142,
-                            height: 30,
                             child: Text(
                               "Hesap oluştur",
                               style: TextStyle(
@@ -298,8 +294,8 @@ class _SignUpState extends State<SignUp> {
                           ),
                         ),
                         SizedBox(
-                          width: 316,
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Checkbox(
                                 shape: RoundedRectangleBorder(
