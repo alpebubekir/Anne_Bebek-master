@@ -1,97 +1,234 @@
+import 'dart:math';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import 'MainPage.dart';
+import 'Makaleler.dart';
 
 class TextPage extends StatefulWidget {
-  const TextPage({Key? key, required this.item}) : super(key: key);
+  const TextPage({Key? key, required this.item, required this.makaleList})
+      : super(key: key);
 
-  final Item item;
+  final List<Makale> makaleList;
+  final Makale item;
 
   @override
   State<TextPage> createState() => _TextPageState();
 }
 
 class _TextPageState extends State<TextPage> {
-  List<Item> newsList = [];
+  List<Makale> newsList = [];
 
   @override
   void initState() {
-    // TODO: implement initState
+    getBenzer();
     super.initState();
-    newsList.add(Item("Anne Duyarlılığı", 'images/benzer_icerik_1.png', 50000,
-        "Özge Karakaya Suzan", "1 hafta önce", "Text"));
-
-    newsList.add(Item("Güvenli Bağlanma", 'images/benzer_icerik_2.png', 50000,
-        "Nursan Çınar", "1 hafta önce", "Text"));
   }
 
-  Widget item1Widget(Item item) {
-    return Container(
-      width: double.infinity,
-      height: 100,
-      margin: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: Offset(0, 3), // changes position of shadow
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            margin: EdgeInsets.all(20),
-            child: Image.asset(item.url),
-          ),
-          Spacer(),
-          Container(
-            height: double.infinity,
-            child: Align(
-              alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    item.title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                  Text(
-                    item.writer,
-                    style: TextStyle(fontSize: 16),
+  Future<void> getBenzer() async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("Makaleler");
+    var snapshot = await ref.get();
+    int makaleLength = snapshot.children.length;
+
+    var rng = Random();
+    int item1Index = rng.nextInt(makaleLength);
+    while (item1Index == widget.item.id) {
+      item1Index = rng.nextInt(makaleLength);
+    }
+    int item2Index = rng.nextInt(makaleLength);
+    while (item2Index == item1Index || item2Index == widget.item.id) {
+      item2Index = rng.nextInt(makaleLength);
+    }
+    int i = 0;
+    for (Makale item in widget.makaleList) {
+      if (i == item2Index || i == item1Index) {
+        newsList.add(item);
+      }
+      i++;
+    }
+    setState(() {});
+  }
+
+  void goToTextPage(Makale item) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (route) => TextPage(
+                  item: item,
+                  makaleList: widget.makaleList,
+                )));
+  }
+
+  Widget item1Widget(Makale item) {
+    return GestureDetector(
+      onTap: () => goToTextPage(item),
+      child: LayoutBuilder(
+        builder: (context, constarints) {
+          if (constarints.maxHeight < 760) {
+            return Container(
+              width: double.infinity,
+              height: 80,
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
                   ),
                 ],
               ),
-            ),
-          ),
-          Spacer(),
-          Container(
-            height: double.infinity,
-            width: 70,
-            child: Align(
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.chevron_right,
-                color: Color(0xffC58BF2),
-                size: 50,
+              child: Row(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(20),
+                    child: Image.asset("images/makale_first.png"),
+                  ),
+                  Container(
+                    height: double.infinity,
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            item.title,
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        /*Container(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            item.writer,
+                            style: TextStyle(
+                                fontSize: 12, color: Color(0xff7B6F72)),
+                          ),
+                        ),*/
+                      ],
+                    ),
+                  ),
+                  Spacer(),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      width: 35,
+                      height: 35,
+                      margin: EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffC58BF2)),
+                          borderRadius: BorderRadius.circular(360)),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.chevron_right_rounded,
+                          color: Color(0xffC58BF2),
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-        ],
+            );
+          } else {
+            return Container(
+              width: double.infinity,
+              height: 80,
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(20),
+                    child: Image.asset("images/makale_first.png"),
+                  ),
+                  Container(
+                    height: double.infinity,
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            item.title,
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        /*Container(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            item.writer,
+                            style: TextStyle(
+                                fontSize: 13, color: Color(0xff7B6F72)),
+                          ),
+                        ),*/
+                      ],
+                    ),
+                  ),
+                  Spacer(),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      width: 35,
+                      height: 35,
+                      margin: EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffC58BF2)),
+                          borderRadius: BorderRadius.circular(360)),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.chevron_right_rounded,
+                          color: Color(0xffC58BF2),
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        },
       ),
     );
+  }
+
+  String stringFormatter(String s) {
+    return s.replaceAll("/*", "\n");
   }
 
   @override
   // TODO: implement widget
   TextPage get widget => super.widget;
+
+  void goToMakaleler() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (route) => Makaleler(makaleList: widget.makaleList)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,18 +238,23 @@ class _TextPageState extends State<TextPage> {
         body: SingleChildScrollView(
           child: Container(
             decoration: BoxDecoration(
-                gradient: LinearGradient(
-              begin: Alignment(-0.95, 0.0),
-              end: Alignment(1.0, 0.0),
-              colors: [
-                const Color(0xff92A3FD),
-                const Color(0xff9DCEFF),
-              ],
-              stops: [0.0, 1.0],
-            )),
+              gradient: LinearGradient(
+                begin: Alignment(-0.95, 0.0),
+                end: Alignment(1.0, 0.0),
+                colors: [
+                  const Color(0xff92A3FD),
+                  const Color(0xff9DCEFF),
+                ],
+                stops: [0.0, 1.0],
+              ),
+            ),
             child: Column(
               children: [
                 Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(widget.item.image),
+                          fit: BoxFit.cover)),
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.5,
                   child: Column(
@@ -141,11 +283,6 @@ class _TextPageState extends State<TextPage> {
                           ),
                         ),
                       ),
-                      Container(
-                        width: 300,
-                        height: 200,
-                        child: Image.asset("images/text_page_picture.png"),
-                      )
                     ],
                   ),
                 ),
@@ -166,11 +303,11 @@ class _TextPageState extends State<TextPage> {
                         child: Padding(
                           padding: EdgeInsets.only(left: 30),
                           child: Column(
-                            children: const [
+                            children: [
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "Anne Çocuk Bağlanması Nedir?",
+                                  widget.item.title,
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
@@ -299,18 +436,35 @@ class _TextPageState extends State<TextPage> {
                       Container(
                         padding: EdgeInsets.only(left: 30, top: 40, right: 30),
                         child: Text(
-                          "Annelik nedir? Anne olunur mu? Yoksa içgüdüsel midir? Bütün kadınlarda annelik söz konusu mudur? Kadın olmak eşittir annelik midir? Gibi pek çok soruya anneliğe adaptasyondan bahsederek açıklık getirmeye çalışacağım.\nAnne olma süreci kadının hayat döngüsünde en önemli gelişimsel geçişlerden birisidir. Bu süreç, aileye yeni bir üyenin katılması ile çoğu zaman mutluluk verici bir olay olmaktadır. Her kadının anneliğe geçiş deneyimi eşsizdir. Bu eşsiz deneyim anneye, bebeğe ve çevreye ait değişkenlerden etkilenebilmektedir. Annenin doğum süreci, bebeğin sağlığı ve sosyal destek varlığı bu değişkenlere örnek olarak verilebilir. Bebeğin doğumu ile aile yaşantısında büyük değişiklikler meydana gelmekte ve çiftlerin her biri yeni roller edinmektedirler.  Anne her çocukla birlikte yeni bir annelik kimliği geliştirmek zorundadır. Anneliğe adaptasyonun sağlanması için bazı evrelerden geçilmesi gerekmektedir.\n⦁	İlk olarak annelik rolünün başarabilmesi için gebeliği kabul etmesi ve gebeliğin yaşam stiline entegre edilmesi gereklidir. Öncelikle anne adayının gebeliği kabul edip etmediği, herhangi bir ön yargısının olup olmadığının konuşulması gerekmektedir. Daha sonrasında annelik rolünü ait tanımlamalar yapabilmesi ve karnındaki bebeği ile ilişki kurabilmesi sağlanmalıdır. Ayrıca bebek doğmadan önce eş ve çevre ilişkilerinin yeniden düzenlenmesi, sosyal destek kaynaklarının belirlenmesi, doğum için gerekli hazırlıkların yapılması da önemlidir gerekmektedir.\n\n⦁	İkinci evre, annenin çocuğunu dünyaya getirmesi ile başlar. Bu aşamada annenin bebeğinin bakımını yapabilmesi önem taşır. Anne bebeğinin bakımını yaparken hemşiresi tarafından kendisine öğretilen bakım becerilerini tamamen aynı şekilde yapmaya çalışır. Anne, tamamen rol modellerini taklit eder. Bu evrede anne bebeğinin bakımını yapabildikçe mutluluk ve memnuniyet sağlayarak annelik rol yeteneği kazanımını ilerletmeye başlar.\n\n⦁	Üçüncü evre, Anne, bebeğine bakım verirken bu evrede artık kendi annelik ve bakım stillerini oluşturmaya ve kendi tercihlerini yansıtmaya başlamıştır. Bu safhada kadın nasıl bir anne olacağını da belirlemeye çalışır. Annelik deneyimi kazandıkça bebeğin bakımında daha esnek davranmaya ve daha ince ayrıntıları fark etmeye başlar. Bu aşamayı sağlıklı bir şekilde geçirdiğinin önemli göstergelerinden biri annelik rollerini yerine getirirken aynı zamanda eş olma gibi diğer rollerini de sağlıklı bir şekilde yerine getirmesi ve rol çatışması yaşamamasıdır.\n\n⦁	Dördüncü evre, önceki safhaları sağlıklı şekilde yerine getirip bu aşamaya ulaşan anne, artık anne olmanın keyfini çıkarır. Önceki safhalarda bebek bakımını öğrenmiş, kendi stillerini geliştirmiş, rol çatışması sorununu halletmiş, esnek tutum davranışları geliştirmiş, bebeği ile zevkli zamanlar geliştirmeye başlamış ve anneliğe tamamen uyum sağlamıştır. Bebeğin aileye katılması ile bozulan uyum tekrardan bu evrede sağlanmıştır. Bu evre kısaca annenin rolü kazanmasında ustalaştığı ve kendine güven kazandığı aşama olarak açıklanabilir.\nBabanın önemi annelik rolüne uyum sağlamada oldukça önemlidir. Babanın desteği, başka herhangi bir kişi tarafından giderilemeyecek şekilde annelik rolüne katkıda bulunur.",
+                          stringFormatter(widget.item.text),
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.only(left: 30, top: 40),
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Benzer Konular",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold),
+                        padding: EdgeInsets.only(left: 30, top: 40, right: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Benzer İçerikler",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Spacer(),
+                            GestureDetector(
+                              onTap: goToMakaleler,
+                              child: Text(
+                                "hepsi",
+                                style: TextStyle(color: Color(0xffF2994A)),
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 20,
+                              color: Color(0xffF2994A),
+                            )
+                          ],
                         ),
                       ),
                       Container(
@@ -319,7 +473,7 @@ class _TextPageState extends State<TextPage> {
                         child: ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: newsList.length,
+                          itemCount: newsList.length == 0 ? 0 : 2,
                           itemBuilder: (BuildContext context, int index) {
                             return item1Widget(newsList[index]);
                           },

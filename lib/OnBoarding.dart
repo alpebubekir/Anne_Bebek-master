@@ -159,7 +159,7 @@ class _OnBoardingState extends State<OnBoarding> {
                     image: DecorationImage(
                       alignment: Alignment.topCenter,
                       image: AssetImage(
-                        "images/onboarding_second.png",
+                        "images/onboarding2.png",
                       ),
                       fit: BoxFit.fitWidth,
                     ),
@@ -202,7 +202,7 @@ class _OnBoardingState extends State<OnBoarding> {
                         image: DecorationImage(
                           alignment: Alignment.topCenter,
                           image: AssetImage(
-                            "images/onboarding_second.png",
+                            "images/onboarding2.png",
                           ),
                           fit: BoxFit.fill,
                         ),
@@ -357,7 +357,7 @@ class _OnBoardingState extends State<OnBoarding> {
                     image: DecorationImage(
                       alignment: Alignment.topCenter,
                       image: AssetImage(
-                        "images/onboarding_second.png",
+                        "images/onboarding4.png",
                       ),
                       fit: BoxFit.fitWidth,
                     ),
@@ -400,7 +400,7 @@ class _OnBoardingState extends State<OnBoarding> {
                         image: DecorationImage(
                           alignment: Alignment.topCenter,
                           image: AssetImage(
-                            "images/onboarding_second.png",
+                            "images/onboarding4.png",
                           ),
                           fit: BoxFit.fill,
                         ),
