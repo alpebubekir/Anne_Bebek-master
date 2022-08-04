@@ -16,7 +16,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   late String name = "", surname;
-  List<Item> itemList = [];
+  //List<Item> itemList = [];
   List<VideoItem> videoItemList = [];
   List<Item> newsList = [];
   List<Person> personList = [];
@@ -43,28 +43,6 @@ class _MainPageState extends State<MainPage> {
   }
 
   void getItems() {
-    itemList.add(Item(
-        "Anne Çocuk Bağı",
-        "https://i.picsum.photos/id/225/200/200.jpg?hmac=52EiCj00RHCtvmOTzd1OIWV0prXw1EISWtV8iI65NL4",
-        50000,
-        "Özge Karakaya Suzan",
-        "1 hafta önce",
-        "Text"));
-    itemList.add(Item(
-        "Anne Çocuk Bağı",
-        "https://i.picsum.photos/id/192/200/200.jpg?hmac=ADFozPC7IeAOBiVxD2ZbHYkpCVEa8Xj_tZE_Dm7yFuo",
-        656226,
-        "Özge Karakaya Suzan",
-        "1 hafta önce",
-        "Text"));
-    itemList.add(Item(
-        "Anne Çocuk Bağı",
-        "https://i.picsum.photos/id/225/200/200.jpg?hmac=52EiCj00RHCtvmOTzd1OIWV0prXw1EISWtV8iI65NL4",
-        50000,
-        "Özge Karakaya Suzan",
-        "1 hafta önce",
-        "Text"));
-
     newsList.add(Item("Anne Çocuk Bağlanması", 'images/makale_first.png', 50000,
         "Özge Karakaya Suzan", "1 hafta önce", "Text"));
 
@@ -345,14 +323,20 @@ class _MainPageState extends State<MainPage> {
     makaleFilterList = [];
     if (text != null && text != "") {
       isFilter = true;
+
       for (Makale m in makaleList) {
-        if (m.title.toUpperCase().contains(text.toUpperCase())) {
+        print(m.title + " " + text);
+        if ((m.title.toUpperCase().contains(text.toUpperCase()) ||
+            m.title.toLowerCase().contains(text.toLowerCase()) &&
+                !makaleFilterList.contains(m))) {
           makaleFilterList.add(m);
         }
       }
 
       for (VideoItem v in videoItemList) {
-        if (v.title.toUpperCase().contains(text.toUpperCase())) {
+        if ((v.title.toUpperCase().contains(text.toUpperCase()) ||
+                v.title.toLowerCase().contains(text.toLowerCase())) &&
+            !videoFilterList.contains(v)) {
           videoFilterList.add(v);
         }
       }

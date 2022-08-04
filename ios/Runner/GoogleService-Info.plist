@@ -30,5 +30,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:26652264040:ios:93dfa27c3309c2b89b9ddd</string>
+	<key>DATABASE_URL</key>
+	<string>https://anne-bebek-default-rtdb.firebaseio.com</string>
 </dict>
 </plist>
