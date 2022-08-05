@@ -23,7 +23,7 @@ class _MakalelerState extends State<Makaleler> {
                 )));
   }
 
-  Widget makaleWidget(Makale item, String asset) {
+  Widget makaleWidget(Makale item) {
     return GestureDetector(
       onTap: () => goToTextPage(item),
       child: Container(
@@ -32,9 +32,13 @@ class _MakalelerState extends State<Makaleler> {
         child: Row(
           children: [
             Container(
+              height: 80,
               padding: EdgeInsets.only(left: 10),
               width: MediaQuery.of(context).size.width * 0.3,
-              child: Image.asset(asset),
+              child: Image.asset(
+                "images/" + item.id + ".jpg",
+                fit: BoxFit.cover,
+              ),
             ),
             Container(
               padding: EdgeInsets.only(left: 20),
@@ -138,13 +142,7 @@ class _MakalelerState extends State<Makaleler> {
                 shrinkWrap: true,
                 itemCount: widget.makaleList.length,
                 itemBuilder: (BuildContext context, int index) {
-                  if (index % 2 == 0) {
-                    return makaleWidget(
-                        widget.makaleList[index], "images/makale_image_1.png");
-                  } else {
-                    return makaleWidget(
-                        widget.makaleList[index], "images/makale_image_2.png");
-                  }
+                  return makaleWidget(widget.makaleList[index]);
                 },
               ),
             )

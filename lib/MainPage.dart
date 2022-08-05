@@ -10,13 +10,12 @@ import 'VideoPage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
-
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  late String name = "", surname;
+  late String name = "", surname = "";
   //List<Item> itemList = [];
   List<VideoItem> videoItemList = [];
   List<Item> newsList = [];
@@ -28,6 +27,18 @@ class _MainPageState extends State<MainPage> {
   bool isFilter = false;
 
   List<Makale> makaleList = [];
+
+  Future<void> getName() async {
+    DatabaseReference ref = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+
+    var snapshot1 = await ref.child("isim").get();
+    var snapshot2 = await ref.child("soyisim").get();
+
+    name = snapshot1.value.toString();
+    surname = snapshot2.value.toString();
+    setState(() {});
+  }
 
   void signOut() {
     FirebaseAuth.instance.signOut();
@@ -198,18 +209,6 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Future<void> getName() async {
-    DatabaseReference ref = FirebaseDatabase.instance
-        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
-
-    var snapshot1 = await ref.child("isim").get();
-    var snapshot2 = await ref.child("soyisim").get();
-
-    name = snapshot1.value.toString();
-    surname = snapshot2.value.toString();
-    setState(() {});
-  }
-
   void goToTextPage(Makale item) {
     Navigator.push(
         context,
@@ -256,8 +255,15 @@ class _MainPageState extends State<MainPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
+              width: 90,
+              height: 90,
               margin: EdgeInsets.all(5),
-              child: Image.asset('images/card_first.png'),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(360),
+                  child: Image.asset(
+                    'images/' + item.id + '.jpg',
+                    fit: BoxFit.cover,
+                  )),
             ),
             Text(
               item.title,
@@ -447,8 +453,15 @@ class _MainPageState extends State<MainPage> {
               child: Row(
                 children: [
                   Container(
+                    width: 50,
+                    height: 50,
                     margin: EdgeInsets.all(20),
-                    child: Image.asset("images/makale_first.png"),
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(360),
+                        child: Image.asset(
+                          "images/" + item.id + ".jpg",
+                          fit: BoxFit.cover,
+                        )),
                   ),
                   Container(
                     height: double.infinity,
@@ -519,8 +532,15 @@ class _MainPageState extends State<MainPage> {
               child: Row(
                 children: [
                   Container(
+                    width: 50,
+                    height: 50,
                     margin: EdgeInsets.all(20),
-                    child: Image.asset("images/makale_first.png"),
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(360),
+                        child: Image.asset(
+                          "images/" + item.id + ".jpg",
+                          fit: BoxFit.cover,
+                        )),
                   ),
                   Container(
                     height: double.infinity,

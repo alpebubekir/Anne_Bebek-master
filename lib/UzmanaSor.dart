@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import 'SoruCevapla.dart';
 
@@ -47,6 +50,24 @@ class _UzmanaSorState extends State<UzmanaSor> {
         "sender": widget.name + " " + widget.surname,
         "text": textController.text.trim()
       });
+
+      final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
+
+      final response = await http.post(url,
+          headers: {
+            "origin": "https://localhost",
+            "Content-type": "application/json"
+          },
+          body: json.encode({
+            "service_id": "service_jrhtfrc",
+            "template_id": "template_582fvgd",
+            "user_id": "q1EnVdTaxcUZlGOId",
+            "template_params": {
+              "username": widget.name,
+              "message": textController.text
+            }
+          }));
+
       getMesajlar();
       textController.text = "";
     }
@@ -59,9 +80,7 @@ class _UzmanaSorState extends State<UzmanaSor> {
     String uid = FirebaseAuth.instance.currentUser!.uid;
     ref.onValue.listen((event) {
       if (event.snapshot.child(uid).exists) {
-        print("dsadsadsad");
         for (int i = 0; i < event.snapshot.child(uid).children.length; i++) {
-          print("------------------------------>");
           mesajlar.add(Mesaj(
               event.snapshot
                   .child(uid)
@@ -82,9 +101,10 @@ class _UzmanaSorState extends State<UzmanaSor> {
     });
   }
 
-  Widget item(Mesaj item) {
+  Widget item(Mesaj item, double margin) {
+    bool isUzman = item.sender == "Özge Karakaya Suzan" ? true : false;
     return Container(
-      margin: EdgeInsets.only(bottom: 20),
+      margin: EdgeInsets.only(bottom: margin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -101,7 +121,7 @@ class _UzmanaSorState extends State<UzmanaSor> {
             alignment: Alignment.centerLeft,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: Colors.pinkAccent),
+                color: isUzman ? Colors.blueAccent : Colors.pinkAccent),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
@@ -138,20 +158,71 @@ class _UzmanaSorState extends State<UzmanaSor> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.only(top: 50),
-          child: Container(
-            alignment: Alignment.topCenter,
-            width: double.infinity,
-            child: ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: mesajlar.length,
-              itemBuilder: (BuildContext context, int index) {
-                return item(mesajlar[index]);
-              },
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.topCenter,
+              width: double.infinity,
+              child: Column(children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          height: 50,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_back,
+                                size: 18,
+                              ),
+                              onPressed: () => Navigator.of(context).pop(true),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: 50,
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Soru-Cevap",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          height: 50,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
             ),
-          ),
+            Container(
+              child: Container(
+                alignment: Alignment.topCenter,
+                width: double.infinity,
+                child: ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: mesajlar.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (index == mesajlar.length - 1) {
+                      return item(mesajlar[index], 80);
+                    }
+                    return item(mesajlar[index], 20);
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

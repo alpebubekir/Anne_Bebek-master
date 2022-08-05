@@ -37,7 +37,8 @@ class _UzmanCevaplaState extends State<UzmanCevapla> {
                 uid,
                 event.snapshot.child("isim").value.toString(),
                 event.snapshot.child("soyisim").value.toString(),
-                event.snapshot.child("gebelik haftasi").value.toString()));
+                event.snapshot.child("gebelik haftasi").value.toString(),
+                event.snapshot.child("email").value.toString()));
             setState(() {});
           });
         }
@@ -48,8 +49,13 @@ class _UzmanCevaplaState extends State<UzmanCevapla> {
 
   Widget itemWidget(Kullanici item) {
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (route) => SoruCevapla(uid: item.uid))),
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (route) => SoruCevapla(
+                    uid: item.uid,
+                    email: item.email,
+                  ))),
       child: Container(
         decoration: BoxDecoration(
             color: Colors.grey, borderRadius: BorderRadius.circular(20)),
@@ -118,7 +124,7 @@ class _UzmanCevaplaState extends State<UzmanCevapla> {
 }
 
 class Kullanici {
-  final String uid, isim, soyisim, gebelikHaftasi;
+  final String uid, isim, soyisim, gebelikHaftasi, email;
 
-  Kullanici(this.uid, this.isim, this.soyisim, this.gebelikHaftasi);
+  Kullanici(this.uid, this.isim, this.soyisim, this.gebelikHaftasi, this.email);
 }
