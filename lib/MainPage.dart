@@ -1,4 +1,5 @@
 import 'package:anne_bebek/Makaleler.dart';
+import 'package:anne_bebek/UzmanaSor.dart';
 import 'package:anne_bebek/Videolar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -34,7 +35,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void initState() {
-    //getName();
+    getName();
     getItems();
     getMakale();
     getVideo();
@@ -981,7 +982,15 @@ class _MainPageState extends State<MainPage> {
                         onSurface: Colors.transparent,
                         shadowColor: Colors.transparent,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (route) => UzmanaSor(
+                                      name: name,
+                                      surname: surname,
+                                    )));
+                      },
                       child: Center(
                         child: Text(
                           'Şimdi Sor',
