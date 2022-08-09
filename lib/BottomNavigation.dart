@@ -1,6 +1,8 @@
+import 'package:anne_bebek/Etkinlikler.dart';
 import 'package:anne_bebek/MainPage.dart';
 import 'package:anne_bebek/Profile.dart';
 import 'package:anne_bebek/UzmanSec.dart';
+import 'package:anne_bebek/Uzmanlar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,12 @@ class BottomNavigation extends StatefulWidget {
 
 class _BottomNavigationState extends State<BottomNavigation> {
   int currentTab = 0;
-  final List<Widget> widgetList = [MainPage(), Profile()];
+  final List<Widget> widgetList = [
+    MainPage(),
+    Etkinlikler(),
+    Uzmanlar(),
+    Profile()
+  ];
   final PageStorageBucket bucket = PageStorageBucket();
   Widget currentScreen = MainPage();
   bool isUzman = false;
@@ -58,10 +65,16 @@ class _BottomNavigationState extends State<BottomNavigation> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (route) => UzmanSec(name: name, surname: surname)));
+          if (isUzman) {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (route) => UzmanCevapla()));
+          } else {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (route) =>
+                        UzmanSec(name: name, surname: surname)));
+          }
         },
         child: Container(
           width: MediaQuery.of(context).size.height * 0.1,
@@ -85,7 +98,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
               Padding(
                 padding: const EdgeInsets.only(top: 3),
                 child: Text(
-                  "Sor",
+                  isUzman ? "Cevapla" : "Sor",
                   style: TextStyle(fontSize: 16),
                 ),
               ),
@@ -118,7 +131,12 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 )),
             Spacer(),
             GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  setState(() {
+                    currentTab = 1;
+                    currentScreen = Etkinlikler();
+                  });
+                },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -133,10 +151,10 @@ class _BottomNavigationState extends State<BottomNavigation> {
             Spacer(),
             GestureDetector(
                 onTap: () {
-                  if (isUzman) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (route) => UzmanCevapla()));
-                  }
+                  setState(() {
+                    currentTab = 2;
+                    currentScreen = Uzmanlar();
+                  });
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -152,7 +170,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
             GestureDetector(
                 onTap: () {
                   setState(() {
-                    currentTab = 1;
+                    currentTab = 3;
                     currentScreen = Profile();
                   });
                 },
