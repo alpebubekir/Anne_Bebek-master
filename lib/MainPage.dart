@@ -1,21 +1,27 @@
 import 'package:anne_bebek/Makaleler.dart';
-import 'package:anne_bebek/UzmanaSor.dart';
+import 'package:anne_bebek/UzmanSec.dart';
 import 'package:anne_bebek/Videolar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'TextPage.dart';
+import 'Uzman.dart';
 import 'VideoPage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
+
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
   late String name = "", surname = "";
+
+  var textController = TextEditingController();
+
   //List<Item> itemList = [];
   List<VideoItem> videoItemList = [];
   List<Item> newsList = [];
@@ -25,6 +31,7 @@ class _MainPageState extends State<MainPage> {
   List<VideoItem> videoFilterList = [];
 
   bool isFilter = false;
+  bool keybordOpen = false;
 
   List<Makale> makaleList = [];
 
@@ -42,6 +49,12 @@ class _MainPageState extends State<MainPage> {
 
   void signOut() {
     FirebaseAuth.instance.signOut();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    textController.dispose();
   }
 
   @override
@@ -93,7 +106,8 @@ class _MainPageState extends State<MainPage> {
         makaleList.add(Makale(
             snapshot.key.toString(),
             snapshot.child("title").value.toString(),
-            snapshot.child("text").value.toString()));
+            snapshot.child("text").value.toString(),
+            snapshot.child("view").value as int));
       }
     });
   }
@@ -209,7 +223,18 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  void goToTextPage(Makale item) {
+  Future<void> goToTextPage(Makale item) async {
+    DatabaseReference ref = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+
+    ref.child("okunan").update({item.title: ""});
+
+    DatabaseReference ref1 =
+        FirebaseDatabase.instance.ref("Makaleler/" + item.id);
+    var snapshot = await ref1.child("view").get();
+
+    ref1.update({"view": (snapshot.value as int) + 1});
+
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -220,6 +245,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> goToVideoPage(VideoItem item) async {
+    DatabaseReference ref1 = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+    ref1.child("izlenen").update({item.title: ""});
     DatabaseReference ref = FirebaseDatabase.instance.ref("Videolar");
     var snapshot = await ref.child(item.id).child("view").get();
     try {
@@ -265,13 +293,16 @@ class _MainPageState extends State<MainPage> {
                     fit: BoxFit.cover,
                   )),
             ),
-            Text(
-              item.title,
-              maxLines: 1,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: Text(
+                item.title,
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
             ),
             Text(
@@ -328,8 +359,10 @@ class _MainPageState extends State<MainPage> {
   void filter(String text) {
     videoFilterList = [];
     makaleFilterList = [];
+
     if (text != null && text != "") {
       isFilter = true;
+      keybordOpen = true;
 
       for (Makale m in makaleList) {
         print(m.title + " " + text);
@@ -348,7 +381,11 @@ class _MainPageState extends State<MainPage> {
         }
       }
     } else {
+      keybordOpen = false;
       isFilter = false;
+      textController.text = "";
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+      keybordOpen = false;
       videoFilterList = [];
       makaleFilterList = [];
     }
@@ -388,6 +425,7 @@ class _MainPageState extends State<MainPage> {
               child: Column(
                 children: [
                   Container(
+                    padding: EdgeInsets.only(top: 10),
                     alignment: Alignment.centerLeft,
                     child: Text(
                       item.title,
@@ -418,7 +456,7 @@ class _MainPageState extends State<MainPage> {
                       Spacer(),
                       Image.asset("images/youtube_logo.png")
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -732,7 +770,7 @@ class _MainPageState extends State<MainPage> {
       ),
       Container(
         width: double.infinity,
-        height: 250,
+        height: 300,
         child: GridView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
@@ -884,10 +922,16 @@ class _MainPageState extends State<MainPage> {
                                 onSurface: Colors.transparent,
                                 shadowColor: Colors.transparent,
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (route) => UzmanSec(
+                                            name: name, surname: surname)));
+                              },
                               child: Center(
                                 child: Text(
-                                  'Daha fazla',
+                                  'Simdi Sor',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: const Color(0xffffffff),
@@ -990,7 +1034,7 @@ class _MainPageState extends State<MainPage> {
                     top: 20,
                   ),
                   child: Container(
-                    width: 150,
+                    width: 200,
                     height: 34,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(99.0),
@@ -1003,17 +1047,12 @@ class _MainPageState extends State<MainPage> {
                         shadowColor: Colors.transparent,
                       ),
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (route) => UzmanaSor(
-                                      name: name,
-                                      surname: surname,
-                                    )));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (route) => Uzman()));
                       },
                       child: Center(
                         child: Text(
-                          'Şimdi Sor',
+                          'Araştırmacı hakkında',
                           style: TextStyle(
                             fontSize: 15,
                             color: const Color(0xffffffff),
@@ -1091,7 +1130,7 @@ class _MainPageState extends State<MainPage> {
       ),
       Container(
         width: double.infinity,
-        height: 200,
+        height: 230,
         child: GridView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
@@ -1140,6 +1179,7 @@ class _MainPageState extends State<MainPage> {
               Container(
                 margin: EdgeInsets.only(top: 34, left: 20, right: 20),
                 child: TextField(
+                  controller: textController,
                   onChanged: (text) {
                     filter(text);
                   },
@@ -1149,7 +1189,29 @@ class _MainPageState extends State<MainPage> {
                       fontSize: 12.0,
                     ),
                     prefixIcon: Image.asset("images/search_bar.png"),
-                    suffixIcon: Image.asset("images/filter.png"),
+                    suffixIcon: Container(
+                      width: MediaQuery.of(context).size.width * 0.2,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          keybordOpen
+                              ? GestureDetector(
+                                  onTap: () {
+                                    textController.text = "";
+                                    SystemChannels.textInput
+                                        .invokeMethod('TextInput.hide');
+                                    filter("");
+                                    keybordOpen = false;
+                                  },
+                                  child: Icon(
+                                    Icons.close,
+                                  ),
+                                )
+                              : Container(),
+                          Image.asset("images/filter.png"),
+                        ],
+                      ),
+                    ),
                     border: InputBorder.none,
                     hintText: "Arama yap",
                     hintStyle: TextStyle(color: Color(0xffDDDADA)),
@@ -1191,6 +1253,7 @@ class VideoItem {
 
 class Makale {
   final String title, text, id;
+  final int view;
 
-  Makale(this.id, this.title, this.text);
+  Makale(this.id, this.title, this.text, this.view);
 }

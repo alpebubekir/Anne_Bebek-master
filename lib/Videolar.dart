@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
@@ -15,10 +16,13 @@ class Videolar extends StatefulWidget {
 
 class _VideolarState extends State<Videolar> {
   Future<void> goToVideoPage(VideoItem item) async {
+    DatabaseReference ref1 = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+    ref1.child("izlenen").update({item.title: ""});
     DatabaseReference ref = FirebaseDatabase.instance.ref("Videolar");
-    var snapshot = await ref.child(item.id).child("view").get();
+    //var snapshot = await ref.child(item.id).child("view").get();
 
-    ref.child(item.id).update({"view": (snapshot.value as int) + 1});
+    //ref.child(item.id).update({"view": (snapshot.value as int) + 1});
 
     Navigator.push(
         context,
@@ -104,7 +108,7 @@ class _VideolarState extends State<Videolar> {
                             padding: const EdgeInsets.only(left: 5),
                             child: IconButton(
                               icon: Icon(
-                                Icons.arrow_back_ios,
+                                Icons.arrow_back,
                                 size: 18,
                               ),
                               onPressed: () => Navigator.of(context).pop(true),
@@ -123,12 +127,27 @@ class _VideolarState extends State<Videolar> {
                     ),
                     Spacer(),
                     Padding(
-                      padding: const EdgeInsets.only(right: 20),
+                      padding: const EdgeInsets.only(left: 20),
                       child: Align(
                         alignment: Alignment.centerRight,
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: Colors.transparent,
+                        child: Container(
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.transparent,
+                          ),
+                          alignment: Alignment.center,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_back,
+                                size: 18,
+                                color: Colors.transparent,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ),
                         ),
                       ),
                     ),

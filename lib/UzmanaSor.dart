@@ -67,18 +67,17 @@ class _UzmanaSorState extends State<UzmanaSor> {
               "message": textController.text
             }
           }));
-
-      getMesajlar();
       textController.text = "";
+      getMesajlar();
     }
   }
 
   void getMesajlar() {
-    mesajlar = [];
     DatabaseReference ref =
         FirebaseDatabase.instance.ref("Uzman/ivkJYTY6fccl4LdGnYkxFCvUokL2");
     String uid = FirebaseAuth.instance.currentUser!.uid;
     ref.onValue.listen((event) {
+      mesajlar = [];
       if (event.snapshot.child(uid).exists) {
         for (int i = 0; i < event.snapshot.child(uid).children.length; i++) {
           mesajlar.add(Mesaj(
@@ -123,7 +122,7 @@ class _UzmanaSorState extends State<UzmanaSor> {
                 borderRadius: BorderRadius.circular(20),
                 color: isUzman ? Colors.blueAccent : Colors.pinkAccent),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12),
               child: Text(
                 item.text,
                 style: TextStyle(fontSize: 16),

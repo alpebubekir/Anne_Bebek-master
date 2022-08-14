@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -63,6 +64,9 @@ class _VideoPageState extends State<VideoPage> {
   }
 
   Future<void> goToVideoPage(VideoItem item) async {
+    DatabaseReference ref1 = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+    ref1.child("izlenen").update({item.title: ""});
     DatabaseReference ref = FirebaseDatabase.instance.ref("Videolar");
     var snapshot = await ref.child(item.id).child("view").get();
 

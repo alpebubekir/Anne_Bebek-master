@@ -33,11 +33,11 @@ class _SoruCevaplaState extends State<SoruCevapla> {
   }
 
   void getMesajlar() {
-    mesajlar = [];
     DatabaseReference ref = FirebaseDatabase.instance
         .ref("Uzman/ivkJYTY6fccl4LdGnYkxFCvUokL2/" + widget.uid);
 
     ref.onValue.listen((event) {
+      mesajlar = [];
       for (DataSnapshot snapshot in event.snapshot.children) {
         print("sender Girdi");
         mesajlar.add(Mesaj(snapshot.child("sender").value.toString(),
@@ -69,7 +69,7 @@ class _SoruCevaplaState extends State<SoruCevapla> {
                 borderRadius: BorderRadius.circular(20),
                 color: isUzman ? Colors.blueAccent : Colors.pinkAccent),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12),
               child: Text(
                 item.text,
                 style: TextStyle(fontSize: 16),
@@ -113,9 +113,8 @@ class _SoruCevaplaState extends State<SoruCevapla> {
               "userEmail": widget.email,
             }
           }));
-
-      getMesajlar();
       textController.text = "";
+      getMesajlar();
     }
   }
 

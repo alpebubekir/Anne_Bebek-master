@@ -14,40 +14,23 @@ class _EtkinliklerState extends State<Etkinlikler> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 40),
+            padding: const EdgeInsets.only(
+              top: 40,
+            ),
             child: Container(
+              width: double.infinity,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.2,
-                    height: 50,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 5),
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.arrow_back,
-                          size: 18,
-                        ),
-                        onPressed: () => Navigator.of(context).pop(true),
-                      ),
+                  Spacer(),
+                  Text(
+                    "Etkinlikler",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.6,
-                    height: 50,
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Etkinlikler",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.2,
-                    height: 50,
-                  ),
+                  Spacer(),
                 ],
               ),
             ),

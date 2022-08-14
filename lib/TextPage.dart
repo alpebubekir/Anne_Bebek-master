@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
@@ -50,7 +51,17 @@ class _TextPageState extends State<TextPage> {
     setState(() {});
   }
 
-  void goToTextPage(Makale item) {
+  Future<void> goToTextPage(Makale item) async {
+    DatabaseReference ref = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+    ref.child("okunan").update({item.title: ""});
+
+    DatabaseReference ref1 =
+        FirebaseDatabase.instance.ref("Makaleler/" + item.id);
+    var snapshot = await ref1.child("view").get();
+
+    ref1.update({"view": (snapshot.value as int) + 1});
+
     Navigator.push(
         context,
         MaterialPageRoute(

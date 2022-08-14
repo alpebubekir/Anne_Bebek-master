@@ -57,48 +57,74 @@ class _UzmanCevaplaState extends State<UzmanCevapla> {
                     email: item.email,
                   ))),
       child: Container(
+        margin: EdgeInsets.all(10),
+        height: 60,
         decoration: BoxDecoration(
-            color: Colors.grey, borderRadius: BorderRadius.circular(20)),
-        margin: EdgeInsets.all(20),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: Offset(0, 3), // changes position of shadow
+            ),
+          ],
+        ),
+        width: double.infinity,
         child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Text("Ad"),
-                  Text(
-                    item.isim + " ",
-                    style: TextStyle(fontSize: 22),
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Text("Soyad"),
-                  Text(
-                    item.soyisim,
-                    style: TextStyle(fontSize: 22),
-                  )
-                ],
+            Container(
+              width: MediaQuery.of(context).size.width * 0.2,
+              height: 60,
+              alignment: Alignment.center,
+              child: Container(
+                width: 45,
+                height: 45,
+                alignment: Alignment.center,
+                child: Text(
+                  item.isim.substring(0, 1).toUpperCase(),
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                decoration: BoxDecoration(
+                    color: Colors.pink,
+                    borderRadius: BorderRadius.circular(360)),
               ),
             ),
             Spacer(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.5,
+              height: 60,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                item.isim + " " + item.soyisim,
+                style: TextStyle(fontSize: 18),
+                maxLines: 2,
+              ),
+            ),
+            Spacer(),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.2,
+              height: 60,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Gebelik Haftası"),
                   Text(
-                    item.gebelikHaftasi,
-                    style: TextStyle(fontSize: 22),
+                    "Hamilelik haftası:",
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    item.gebelikHaftasi
+                        .substring(0, item.gebelikHaftasi.indexOf(".")),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   )
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -108,15 +134,95 @@ class _UzmanCevaplaState extends State<UzmanCevapla> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        alignment: Alignment.topCenter,
-        width: double.infinity,
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: senders.length,
-          itemBuilder: (BuildContext context, int index) {
-            return itemWidget(senders[index]);
-          },
+      body: SingleChildScrollView(
+        child: Container(
+          alignment: Alignment.topCenter,
+          width: double.infinity,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 40,
+                ),
+                child: Container(
+                  width: double.infinity,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Color(0xffF7F8F8),
+                            ),
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  size: 18,
+                                ),
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        "Cevapla",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Container(
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.transparent,
+                            ),
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  size: 18,
+                                  color: Colors.transparent,
+                                ),
+                                onPressed: () {},
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: senders.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return itemWidget(senders[index]);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

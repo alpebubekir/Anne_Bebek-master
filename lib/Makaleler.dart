@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import 'MainPage.dart';
@@ -13,7 +15,16 @@ class Makaleler extends StatefulWidget {
 }
 
 class _MakalelerState extends State<Makaleler> {
-  void goToTextPage(Makale item) {
+  Future<void> goToTextPage(Makale item) async {
+    DatabaseReference ref = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+    ref.child("okunan").update({item.title: ""});
+
+    DatabaseReference ref1 =
+        FirebaseDatabase.instance.ref("Makaleler/" + item.id);
+    var snapshot = await ref1.child("view").get();
+
+    ref1.update({"view": (snapshot.value as int) + 1});
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -60,7 +71,7 @@ class _MakalelerState extends State<Makaleler> {
                     style: TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                   Text(
-                    "125.547 görüntü - 1 hafta önce",
+                    item.view.toString() + " görüntü - 1 hafta önce",
                     style: TextStyle(color: Colors.grey, fontSize: 14),
                   )
                 ],
@@ -102,7 +113,7 @@ class _MakalelerState extends State<Makaleler> {
                             padding: const EdgeInsets.only(left: 5),
                             child: IconButton(
                               icon: Icon(
-                                Icons.arrow_back_ios,
+                                Icons.arrow_back,
                                 size: 18,
                               ),
                               onPressed: () => Navigator.of(context).pop(true),
@@ -121,12 +132,27 @@ class _MakalelerState extends State<Makaleler> {
                     ),
                     Spacer(),
                     Padding(
-                      padding: const EdgeInsets.only(right: 20),
+                      padding: const EdgeInsets.only(left: 20),
                       child: Align(
                         alignment: Alignment.centerRight,
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: Colors.transparent,
+                        child: Container(
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.transparent,
+                          ),
+                          alignment: Alignment.center,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_back,
+                                size: 18,
+                                color: Colors.transparent,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ),
                         ),
                       ),
                     ),
