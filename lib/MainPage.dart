@@ -1,8 +1,10 @@
 import 'package:anne_bebek/Makaleler.dart';
 import 'package:anne_bebek/UzmanSec.dart';
 import 'package:anne_bebek/Videolar.dart';
+import 'package:anne_bebek/service/locale_push_notification.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -63,8 +65,26 @@ class _MainPageState extends State<MainPage> {
     getItems();
     getMakale();
     getVideo();
+    getToken();
+
+    FirebaseMessaging.instance.getInitialMessage();
+    FirebaseMessaging.onMessage.listen((event) {
+      LocalNotificationService.display(event);
+    });
 
     super.initState();
+  }
+
+  getToken() async {
+    DatabaseReference ref = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+    String? token = await FirebaseMessaging.instance.getToken();
+    var snapshot = await ref.child("token").get();
+
+    if (!snapshot.exists ||
+        (snapshot.exists && token != snapshot.value.toString())) {
+      ref.update({"token": token});
+    }
   }
 
   void getItems() {

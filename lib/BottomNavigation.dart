@@ -6,6 +6,8 @@ import 'package:anne_bebek/Uzmanlar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'UzmanCevapla.dart';
 
@@ -34,6 +36,45 @@ class _BottomNavigationState extends State<BottomNavigation> {
     getName();
     super.initState();
     getIsUzman();
+    checkVersion();
+  }
+
+  Future<void> goToWebsite() async {
+    const url =
+        'https://play.google.com/store/apps/details?id=com.fureb.annebebek.anne_bebek';
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> checkVersion() async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("AppInfo");
+
+    var snapshot = await ref.child("version").get();
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    if (snapshot.value.toString() != packageInfo.version) {
+      await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => WillPopScope(
+          onWillPop: () => Future.value(false),
+          child: AlertDialog(
+            title: const Text('Yeni sürüm mevcut!'),
+            content: const Text('Lütfen uygulamayı güncelleyiniz.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => {goToWebsite()},
+                child: const Text('Güncelle'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> getName() async {

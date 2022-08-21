@@ -20,9 +20,9 @@ class _VideolarState extends State<Videolar> {
         .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
     ref1.child("izlenen").update({item.title: ""});
     DatabaseReference ref = FirebaseDatabase.instance.ref("Videolar");
-    //var snapshot = await ref.child(item.id).child("view").get();
+    var snapshot = await ref.child(item.id).child("view").get();
 
-    //ref.child(item.id).update({"view": (snapshot.value as int) + 1});
+    ref.child(item.id).update({"view": (snapshot.value as int) + 1});
 
     Navigator.push(
         context,

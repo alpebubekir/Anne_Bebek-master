@@ -183,7 +183,7 @@ class _OnBoardingState extends State<OnBoarding> {
                             top: 20,
                           ),
                           child: Text(
-                            "Bu alan bilgi ekleme alanı olarak kullanılacaktır.",
+                            "",
                             style: TextStyle(
                                 fontSize: 14, color: Color(0xFFBFBFBF)),
                           ),
@@ -226,7 +226,7 @@ class _OnBoardingState extends State<OnBoarding> {
                               top: 10,
                             ),
                             child: Text(
-                              "Bu alan bilgi ekleme alanı olarak kullanılacaktır.",
+                              "",
                               style: TextStyle(
                                   fontSize: 14, color: Color(0xFFBFBFBF)),
                             ),
@@ -282,7 +282,7 @@ class _OnBoardingState extends State<OnBoarding> {
                             top: 20,
                           ),
                           child: Text(
-                            "Bu alan bilgi ekleme alanı olarak kullanılacaktır.",
+                            "",
                             style: TextStyle(
                                 fontSize: 14, color: Color(0xFFBFBFBF)),
                           ),
@@ -325,7 +325,7 @@ class _OnBoardingState extends State<OnBoarding> {
                               top: 10,
                             ),
                             child: Text(
-                              "Bu alan bilgi ekleme alanı olarak kullanılacaktır.",
+                              "",
                               style: TextStyle(
                                   fontSize: 14, color: Color(0xFFBFBFBF)),
                             ),
@@ -381,7 +381,7 @@ class _OnBoardingState extends State<OnBoarding> {
                             top: 20,
                           ),
                           child: Text(
-                            "Bu alan bilgi ekleme alanı olarak kullanılacaktır.",
+                            "",
                             style: TextStyle(
                                 fontSize: 14, color: Color(0xFFBFBFBF)),
                           ),
@@ -424,7 +424,7 @@ class _OnBoardingState extends State<OnBoarding> {
                               top: 10,
                             ),
                             child: Text(
-                              "Bu alan bilgi ekleme alanı olarak kullanılacaktır.",
+                              "",
                               style: TextStyle(
                                   fontSize: 14, color: Color(0xFFBFBFBF)),
                             ),
@@ -480,7 +480,7 @@ class _OnBoardingState extends State<OnBoarding> {
                             top: 20,
                           ),
                           child: Text(
-                            "Bu alan bilgi ekleme alanı olarak kullanılacaktır.",
+                            "",
                             style: TextStyle(
                                 fontSize: 14, color: Color(0xFFBFBFBF)),
                           ),
@@ -523,7 +523,7 @@ class _OnBoardingState extends State<OnBoarding> {
                               top: 10,
                             ),
                             child: Text(
-                              "Bu alan bilgi ekleme alanı olarak kullanılacaktır.",
+                              "",
                               style: TextStyle(
                                   fontSize: 14, color: Color(0xFFBFBFBF)),
                             ),
