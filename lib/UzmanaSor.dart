@@ -39,7 +39,7 @@ class _UzmanaSorState extends State<UzmanaSor> {
   sendNotification(String title, String token) async {
     final data = {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-      'id': '1',
+      'id': 'sor',
       'status': 'done',
       'message': "Bir soru soruldu.",
     };

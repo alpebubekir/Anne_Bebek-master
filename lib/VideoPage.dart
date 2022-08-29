@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
 
 import 'MainPage.dart';
@@ -20,18 +22,150 @@ class VideoPage extends StatefulWidget {
 class _VideoPageState extends State<VideoPage> {
   late VideoPlayerController _controller;
   List<VideoItem> videoList = [];
+  bool show = true;
+
+  Future<void> likeButton() async {
+    DatabaseReference ref =
+        FirebaseDatabase.instance.ref("Videolar/" + widget.item.id + "/like");
+    DatabaseReference refname = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+
+    DatabaseReference refdislike = FirebaseDatabase.instance
+        .ref("Videolar/" + widget.item.id + "/dislike");
+
+    refdislike.child(FirebaseAuth.instance.currentUser!.uid).remove();
+
+    var snapshot = await refname.child("isim").get();
+    var snapshot1 = await refname.child("soyisim").get();
+
+    ref.update({
+      FirebaseAuth.instance.currentUser!.uid: {
+        "isim": snapshot.value.toString() + " " + snapshot1.value.toString(),
+        "timestamp": DateTime.now().millisecondsSinceEpoch
+      }
+    });
+
+    sendNotification(
+        "cE7qD1bTQDSINtb36aRZPp:APA91bE07Xofg-XlRHQtVK4Oo8zKw1pXpTMaaIXC00dltFETm7Oy0E0ou7MNHm3dgVwIQaJHV2DAj2lbBUnWvfpUrFeHwQH-rtpNqV56A8wwKF3Us-J4t2SjeSEkplrplsaMWCon5Z2d");
+
+    Navigator.of(context).pop();
+  }
+
+  Future<void> dislikeButton() async {
+    DatabaseReference ref = FirebaseDatabase.instance
+        .ref("Videolar/" + widget.item.id + "/dislike");
+    DatabaseReference refname = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+
+    DatabaseReference reflike =
+        FirebaseDatabase.instance.ref("Videolar/" + widget.item.id + "/like");
+
+    reflike.child(FirebaseAuth.instance.currentUser!.uid).remove();
+
+    var snapshot = await refname.child("isim").get();
+    var snapshot1 = await refname.child("soyisim").get();
+
+    ref.update({
+      FirebaseAuth.instance.currentUser!.uid: {
+        "isim": snapshot.value.toString() + " " + snapshot1.value.toString(),
+        "timestamp": DateTime.now().millisecondsSinceEpoch
+      }
+    });
+
+    sendNotification(
+        "cE7qD1bTQDSINtb36aRZPp:APA91bE07Xofg-XlRHQtVK4Oo8zKw1pXpTMaaIXC00dltFETm7Oy0E0ou7MNHm3dgVwIQaJHV2DAj2lbBUnWvfpUrFeHwQH-rtpNqV56A8wwKF3Us-J4t2SjeSEkplrplsaMWCon5Z2d");
+    Navigator.of(context).pop();
+  }
+
+  sendNotification(String token) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': 'anket',
+      'status': 'done',
+      'message': "Bir video sonu anketi cevaplandı.",
+    };
+
+    try {
+      http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'key=AAAABjSZRmg:APA91bHtoJHoE-syEJV-VWJO52mEaEUuBUCykmyrq8nojd_2WKNGPK3gA85p_AbKsM9AzuGLl-LjlcoJiyB-oG9UsExyOn5VEU50ktJ5yQWxqeJVb12ZAk_OrVm6MJegUzlZe-WknnF0'
+              },
+              body: jsonEncode(<String, dynamic>{
+                'notification': <String, dynamic>{
+                  'title': "Bir video sonu anketi cevaplandı",
+                  'body': "Bir video sonu anketi cevaplandı."
+                },
+                'priority': 'high',
+                'data': data,
+                'to': '$token'
+              }));
+
+      if (response.statusCode == 200) {
+        print("Yeh notificatin is sended");
+      } else {
+        print("Error");
+      }
+    } catch (e) {}
+  }
 
   @override
   void initState() {
     getVideo();
     super.initState();
     _controller = VideoPlayerController.network(widget.item.videoUrl)
-      ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+      ..initialize().then((_) async {
+        print("dadsa");
+        DatabaseReference ref =
+            FirebaseDatabase.instance.ref("Videolar/${widget.item.id}/viewer");
+        String uid = FirebaseAuth.instance.currentUser!.uid;
+        DatabaseReference refname =
+            FirebaseDatabase.instance.ref("Users/" + uid);
+        var snapshot = await refname.child("isim").get();
+        var snapshot1 = await refname.child("soyisim").get();
+
+        ref.update({
+          uid: snapshot.value.toString() + " " + snapshot1.value.toString()
+        });
+
         setState(() {});
       });
 
-    _controller.setLooping(true);
+    _controller.addListener(() async {
+      if (_controller.value.position >= Duration(seconds: 3) && show) {
+        setState(() {});
+        show = false;
+        await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text("Videoyu bğendiniz mi?"),
+                content: Row(
+                  children: [
+                    GestureDetector(
+                        child: Image.asset("images/dislike_red.png"),
+                        onTap: () {
+                          print("Dislike");
+                          dislikeButton();
+                        }),
+                    Spacer(),
+                    GestureDetector(
+                      child: Image.asset("images/like_green.png"),
+                      onTap: () {
+                        print("Like");
+                        likeButton();
+                      },
+                    )
+                  ],
+                ),
+              );
+            });
+      }
+    });
+
+    _controller.setLooping(false);
   }
 
   Future<void> getVideo() async {
@@ -61,6 +195,69 @@ class _VideoPageState extends State<VideoPage> {
   void dispose() {
     super.dispose();
     _controller.dispose();
+  }
+
+  void goToViwers() {
+    if (FirebaseAuth.instance.currentUser!.uid ==
+            "ivkJYTY6fccl4LdGnYkxFCvUokL2" ||
+        FirebaseAuth.instance.currentUser!.uid ==
+            "z5MhoCKtOjV8yGfQfySRBfjdn1y1") {
+      DatabaseReference ref =
+          FirebaseDatabase.instance.ref("Videolar/" + widget.item.id);
+
+      ref.child("viewer").onValue.listen((event) async {
+        List<String> viewerList = [];
+        for (DataSnapshot snapshot in event.snapshot.children) {
+          viewerList.add(snapshot.value.toString());
+        }
+
+        await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Container(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: Text(
+                              "Görüntüleyenler",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            alignment: Alignment.center,
+                          ),
+                          Container(
+                              width: MediaQuery.of(context).size.width * 0.1,
+                              alignment: Alignment.centerRight,
+                              child: IconButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                icon: Icon(
+                                  Icons.close,
+                                  color: Colors.red,
+                                ),
+                              )),
+                        ],
+                      ),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: viewerList.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Text((index + 1).toString() +
+                                  "- " +
+                                  viewerList[index]),
+                            );
+                          })
+                    ],
+                  ),
+                ),
+              );
+            });
+      });
+    }
   }
 
   Future<void> goToVideoPage(VideoItem item) async {
@@ -276,16 +473,19 @@ class _VideoPageState extends State<VideoPage> {
                 style: TextStyle(fontSize: 20),
               ),
             ),
-            Container(
-              padding: EdgeInsets.only(left: 10, top: 30),
-              child: Row(
-                children: [
-                  Image.asset("images/goz.png"),
-                  Text(
-                    "  " + widget.item.view.toString() + " görüntülenme",
-                    style: TextStyle(color: Colors.grey),
-                  )
-                ],
+            GestureDetector(
+              onTap: goToViwers,
+              child: Container(
+                padding: EdgeInsets.only(left: 10, top: 30),
+                child: Row(
+                  children: [
+                    Image.asset("images/goz.png"),
+                    Text(
+                      "  " + widget.item.view.toString() + " görüntülenme",
+                      style: TextStyle(color: Colors.grey),
+                    )
+                  ],
+                ),
               ),
             ),
             Container(

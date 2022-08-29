@@ -7,6 +7,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 import 'TextPage.dart';
 import 'Uzman.dart';
@@ -85,6 +88,42 @@ class _MainPageState extends State<MainPage> {
         (snapshot.exists && token != snapshot.value.toString())) {
       ref.update({"token": token});
     }
+
+    tz.initializeTimeZones();
+
+    var snapshotgebelik = await ref.child("gebelik haftasi").get();
+
+    DateTime creation =
+        FirebaseAuth.instance.currentUser!.metadata.creationTime!;
+
+    String gebelik = snapshotgebelik.value.toString();
+    int initial = int.parse(gebelik.substring(0, gebelik.indexOf(".")));
+
+    var fark = DateTime.now().difference(creation);
+
+    int haftaFark = (fark.inDays / 7).toInt();
+
+    int guncel = initial + haftaFark > 36 ? 36 : initial + haftaFark;
+
+    DateTime date =
+        DateTime.now().add(Duration(days: (36 - guncel) * 7, minutes: 15));
+
+    FlutterLocalNotificationsPlugin fl = FlutterLocalNotificationsPlugin();
+    var android = AndroidNotificationDetails("mychannel", "mychannel",
+        importance: Importance.high, priority: Priority.max, playSound: true);
+    var ios = IOSNotificationDetails();
+    NotificationDetails notificationDetails =
+        NotificationDetails(android: android, iOS: ios);
+
+    fl.zonedSchedule(
+        25,
+        "Anne Bebek Bağlanması",
+        "Sizin için bir anket var",
+        tz.TZDateTime.from(date, tz.getLocation("Europe/Istanbul")),
+        notificationDetails,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidAllowWhileIdle: true);
   }
 
   void getItems() {
@@ -110,7 +149,7 @@ class _MainPageState extends State<MainPage> {
             snapshot.child("title").value.toString(),
             snapshot.child("link").value.toString(),
             "images/video_banner.png",
-            snapshot.child("view").value as int,
+            snapshot.child("viewer").children.length,
             snapshot.child("writer").value.toString(),
             snapshot.child("appellation").value.toString()));
       }

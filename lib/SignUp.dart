@@ -1,8 +1,10 @@
 import 'package:anne_bebek/LogIn.dart';
 import 'package:anne_bebek/MoreInformation.dart';
+import 'package:anne_bebek/Web.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -21,12 +23,39 @@ class _SignUpState extends State<SignUp> {
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
   bool _passwordVisible = false;
+  late TapGestureRecognizer tapGestureRecognizer;
+  late TapGestureRecognizer tapGestureRecognizer1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    tapGestureRecognizer = TapGestureRecognizer()
+      ..onTap = () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (route) =>
+                    Web(url: "http://cetinkaraca.com.tr/kvkk.html")));
+      };
+    tapGestureRecognizer1 = TapGestureRecognizer()
+      ..onTap = () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (route) => Web(
+                    url:
+                        "http://cetinkaraca.com.tr/tibbi-sorumluluk-reddi.html")));
+      };
+  }
 
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
     nameController.dispose();
     surnameController.dispose();
+    tapGestureRecognizer.dispose();
+    tapGestureRecognizer1.dispose();
 
     super.dispose();
   }
@@ -315,17 +344,33 @@ class _SignUpState extends State<SignUp> {
                                 checkColor: Color(0xFFF4F4F4),
                               ),
                               Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text.rich(
-                                    TextSpan(
-                                      text: "Aydınlatma metnini ",
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Color(0xFFBFBFBF),
+                                  Row(
+                                    children: [
+                                      Text.rich(
+                                        TextSpan(
+                                          text: "Gizlilik ve Güvenlik ",
+                                          recognizer: tapGestureRecognizer,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0xFFBFBFBF),
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                        ),
                                       ),
-                                      children: <TextSpan>[
+                                      Text(
+                                        "ve ",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFFBFBFBF),
+                                        ),
+                                      ),
+                                      Text.rich(
                                         TextSpan(
-                                          text: "Privacy Policy ",
+                                          text: "Tıbbi sorumluluk reddi ",
+                                          recognizer: tapGestureRecognizer1,
                                           style: TextStyle(
                                             fontSize: 10,
                                             color: Color(0xFFBFBFBF),
@@ -333,42 +378,21 @@ class _SignUpState extends State<SignUp> {
                                                 TextDecoration.underline,
                                           ),
                                         ),
-                                        TextSpan(
-                                          text: "and ",
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Color(0xFFBFBFBF),
-                                          ),
+                                      ),
+                                      Text(
+                                        "'ni okudum ",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFFBFBFBF),
                                         ),
-                                        TextSpan(
-                                          text: "Term of Use ",
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Color(0xFFBFBFBF),
-                                            decoration:
-                                                TextDecoration.underline,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: "kabul ",
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Color(0xFFBFBFBF),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      right: 210,
-                                    ),
-                                    child: Text(
-                                      "ediyorum.",
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Color(0xFFBFBFBF),
-                                      ),
+                                  Text(
+                                    "ve kabul ediyorum ",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Color(0xFFBFBFBF),
                                     ),
                                   ),
                                 ],
@@ -696,17 +720,34 @@ class _SignUpState extends State<SignUp> {
                                     checkColor: Color(0xFFF4F4F4),
                                   ),
                                   Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Text.rich(
-                                        TextSpan(
-                                          text: "Aydınlatma metnini ",
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Color(0xFFBFBFBF),
+                                      Row(
+                                        children: [
+                                          Text.rich(
+                                            TextSpan(
+                                              text: "Gizlilik ve Güvenlik ",
+                                              recognizer: tapGestureRecognizer,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Color(0xFFBFBFBF),
+                                                decoration:
+                                                    TextDecoration.underline,
+                                              ),
+                                            ),
                                           ),
-                                          children: <TextSpan>[
+                                          Text(
+                                            "ve ",
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: Color(0xFFBFBFBF),
+                                            ),
+                                          ),
+                                          Text.rich(
                                             TextSpan(
-                                              text: "Privacy Policy ",
+                                              text: "Tıbbi sorumluluk reddi ",
+                                              recognizer: tapGestureRecognizer1,
                                               style: TextStyle(
                                                 fontSize: 10,
                                                 color: Color(0xFFBFBFBF),
@@ -714,42 +755,21 @@ class _SignUpState extends State<SignUp> {
                                                     TextDecoration.underline,
                                               ),
                                             ),
-                                            TextSpan(
-                                              text: "and ",
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: Color(0xFFBFBFBF),
-                                              ),
+                                          ),
+                                          Text(
+                                            "'ni okudum ",
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: Color(0xFFBFBFBF),
                                             ),
-                                            TextSpan(
-                                              text: "Term of Use ",
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: Color(0xFFBFBFBF),
-                                                decoration:
-                                                    TextDecoration.underline,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: "kabul ",
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: Color(0xFFBFBFBF),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          right: 210,
-                                        ),
-                                        child: Text(
-                                          "ediyorum.",
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Color(0xFFBFBFBF),
-                                          ),
+                                      Text(
+                                        "ve kabul ediyorum ",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xFFBFBFBF),
                                         ),
                                       ),
                                     ],

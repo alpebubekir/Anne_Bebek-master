@@ -137,7 +137,7 @@ class _SoruCevaplaState extends State<SoruCevapla> {
   sendNotification(String token) async {
     final data = {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-      'id': '1',
+      'id': 'cevap',
       'status': 'done',
       'message': "Sorunuza cevap verildi.",
     };
