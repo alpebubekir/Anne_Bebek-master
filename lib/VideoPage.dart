@@ -45,9 +45,11 @@ class _VideoPageState extends State<VideoPage> {
       }
     });
 
-    sendNotification(
-        "cE7qD1bTQDSINtb36aRZPp:APA91bE07Xofg-XlRHQtVK4Oo8zKw1pXpTMaaIXC00dltFETm7Oy0E0ou7MNHm3dgVwIQaJHV2DAj2lbBUnWvfpUrFeHwQH-rtpNqV56A8wwKF3Us-J4t2SjeSEkplrplsaMWCon5Z2d");
+    DatabaseReference reftoken =
+        FirebaseDatabase.instance.ref("Users/ivkJYTY6fccl4LdGnYkxFCvUokL2");
+    var token = await reftoken.child("token").get();
 
+    sendNotification(token.value.toString());
     Navigator.of(context).pop();
   }
 
@@ -71,9 +73,11 @@ class _VideoPageState extends State<VideoPage> {
         "timestamp": DateTime.now().millisecondsSinceEpoch
       }
     });
+    DatabaseReference reftoken =
+        FirebaseDatabase.instance.ref("Users/ivkJYTY6fccl4LdGnYkxFCvUokL2");
+    var token = await reftoken.child("token").get();
 
-    sendNotification(
-        "cE7qD1bTQDSINtb36aRZPp:APA91bE07Xofg-XlRHQtVK4Oo8zKw1pXpTMaaIXC00dltFETm7Oy0E0ou7MNHm3dgVwIQaJHV2DAj2lbBUnWvfpUrFeHwQH-rtpNqV56A8wwKF3Us-J4t2SjeSEkplrplsaMWCon5Z2d");
+    sendNotification(token.value.toString());
     Navigator.of(context).pop();
   }
 
@@ -134,25 +138,43 @@ class _VideoPageState extends State<VideoPage> {
       });
 
     _controller.addListener(() async {
-      if (_controller.value.position >= Duration(seconds: 3) && show) {
+      print(_controller.value.position.toString() +
+          " " +
+          _controller.value.duration.toString());
+      if (_controller.value.duration != Duration(seconds: 0) &&
+          _controller.value.position == _controller.value.duration &&
+          show) {
         setState(() {});
         show = false;
         await showDialog(
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: Text("Videoyu bğendiniz mi?"),
+                title: Text("Video faydalı oldu mu?"),
                 content: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    Spacer(),
                     GestureDetector(
-                        child: Image.asset("images/dislike_red.png"),
+                        child: Image.asset(
+                          "images/dislike_red.png",
+                          width: 25,
+                          height: 25,
+                        ),
                         onTap: () {
                           print("Dislike");
                           dislikeButton();
                         }),
-                    Spacer(),
+                    SizedBox(
+                      width: 20,
+                    ),
                     GestureDetector(
-                      child: Image.asset("images/like_green.png"),
+                      child: Image.asset(
+                        "images/like_green.png",
+                        width: 25,
+                        height: 25,
+                      ),
                       onTap: () {
                         print("Like");
                         likeButton();
