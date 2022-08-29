@@ -29,14 +29,13 @@ class _BottomNavigationState extends State<BottomNavigation> {
     Etkinlikler(shouldShow: false),
     Uzmanlar(),
     Profile(
-      name: "",
-      surname: "",
-      kilo: null,
-      boy: null,
-      yas: null,
-      isUzman: false,
-      bildirimList: [],
-    )
+        name: "",
+        surname: "",
+        kilo: null,
+        boy: null,
+        yas: null,
+        isUzman: false,
+        bildirimList: [])
   ];
   final PageStorageBucket bucket = PageStorageBucket();
   Widget currentScreen = MainPage();

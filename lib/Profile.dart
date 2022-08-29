@@ -113,16 +113,7 @@ class _ProfileState extends State<Profile> {
   Widget hesapItem(Image image, String title, Widget? goTo) {
     return GestureDetector(
       onTap: () {
-        if (goTo == null) {
-          Fluttertoast.showToast(
-              msg: "Çok yakında!",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.grey,
-              textColor: Colors.white,
-              fontSize: 16.0);
-        } else {
+        if (goTo != null) {
           Navigator.push(context, MaterialPageRoute(builder: (route) => goTo));
         }
       },
@@ -139,7 +130,7 @@ class _ProfileState extends State<Profile> {
               ),
             ),
             Spacer(),
-            Icon(Icons.arrow_forward_ios_rounded)
+            goTo == null ? Container() : Icon(Icons.arrow_forward_ios_rounded)
           ],
         ),
       ),
@@ -384,7 +375,7 @@ class _ProfileState extends State<Profile> {
                   ),
                   "Şifre Değiştir",
                   ChangePassword()),
-              hesapItem(
+              /*hesapItem(
                   Image.asset(
                     "images/icon_activity.png",
                     width: 30,
@@ -401,7 +392,7 @@ class _ProfileState extends State<Profile> {
                     fit: BoxFit.cover,
                   ),
                   "Katılım Geçmişi",
-                  null),
+                  null),*/
               GestureDetector(
                 onTap: () {
                   FirebaseAuth.instance.signOut();
@@ -572,18 +563,34 @@ class _ProfileState extends State<Profile> {
                       height: 30,
                       fit: BoxFit.cover,
                     ),
-                    "Çetin Karaca",
+                    "Özge Karakaya Suzan",
                     null),
               ),
-              hesapItem(
-                  Image.asset(
-                    "images/icon_message.png",
-                    width: 30,
-                    height: 30,
-                    fit: BoxFit.cover,
+              GestureDetector(
+                onTap: () {},
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 5),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        "images/icon_message.png",
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.cover,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Text(
+                          "ozgekarakayasuzan@sakarya.edu.tr",
+                          style:
+                              TextStyle(fontSize: 16, color: Color(0xff7B6F72)),
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
                   ),
-                  "info@cetinkaraca.com.tr",
-                  null)
+                ),
+              )
             ],
           ),
         ),
