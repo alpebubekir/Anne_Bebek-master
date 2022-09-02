@@ -625,7 +625,7 @@ class _ProfileState extends State<Profile> {
                         child: Text(
                           "ozgekarakayasuzan@sakarya.edu.tr",
                           style:
-                              TextStyle(fontSize: 16, color: Color(0xff7B6F72)),
+                              TextStyle(fontSize: 14, color: Color(0xff7B6F72)),
                           maxLines: 1,
                         ),
                       ),
