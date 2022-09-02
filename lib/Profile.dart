@@ -8,6 +8,8 @@ import 'package:flutter_switch/flutter_switch.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'MainPage.dart';
+
 class Profile extends StatefulWidget {
   const Profile(
       {Key? key,
@@ -17,13 +19,15 @@ class Profile extends StatefulWidget {
       required this.boy,
       required this.yas,
       required this.isUzman,
-      required this.bildirimList})
+      required this.bildirimList,
+      required this.videoItemList})
       : super(key: key);
 
   final String name, surname;
   final int? kilo, boy, yas;
   final bool isUzman;
   final List<Bildirim> bildirimList;
+  final List<VideoItem> videoItemList;
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -141,9 +145,6 @@ class _ProfileState extends State<Profile> {
     return Container(
       width: double.infinity,
       margin: EdgeInsets.symmetric(vertical: 5, horizontal: 25),
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey, width: 1),
-          borderRadius: BorderRadius.circular(15)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -155,16 +156,23 @@ class _ProfileState extends State<Profile> {
             },
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: selected == 0 ? Color(0xffF28F8F) : Colors.white),
-              alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: Text(
-                "Profil",
-                style: TextStyle(
-                    fontSize: 22,
-                    color: selected == 0 ? Colors.white : Color(0xff555B6A)),
+              alignment: Alignment.bottomCenter,
+              width: MediaQuery.of(context).size.width * 0.25,
+              child: Column(
+                children: [
+                  Text(
+                    "Profil",
+                    style: TextStyle(fontSize: 16, color: Color(0xff555B6A)),
+                  ),
+                  Container(
+                    height: 4,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: selected == 0
+                            ? Color(0xffF28F8F)
+                            : Colors.transparent),
+                  )
+                ],
               ),
             ),
           ),
@@ -176,16 +184,50 @@ class _ProfileState extends State<Profile> {
             },
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: selected == 1 ? Color(0xffF28F8F) : Colors.white),
-              alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: Text(
-                "Log Yönetimi",
-                style: TextStyle(
-                    fontSize: 22,
-                    color: selected == 1 ? Colors.white : Color(0xff555B6A)),
+              alignment: Alignment.bottomCenter,
+              width: MediaQuery.of(context).size.width * 0.25,
+              child: Column(
+                children: [
+                  Text(
+                    "Log Yönetimi",
+                    style: TextStyle(fontSize: 16, color: Color(0xff555B6A)),
+                  ),
+                  Container(
+                    height: 4,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: selected == 1
+                            ? Color(0xffF28F8F)
+                            : Colors.transparent),
+                  )
+                ],
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              selected = 2;
+              baslik = "Video İzlenme";
+              setState(() {});
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 5),
+              alignment: Alignment.bottomCenter,
+              width: MediaQuery.of(context).size.width * 0.25,
+              child: Column(
+                children: [
+                  Text(
+                    "Video İzlenme",
+                    style: TextStyle(fontSize: 16, color: Color(0xff555B6A)),
+                  ),
+                  Container(
+                      height: 4,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: selected == 2
+                              ? Color(0xffF28F8F)
+                              : Colors.transparent))
+                ],
               ),
             ),
           ),
@@ -601,7 +643,193 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Widget item(String title, String subtitle, String time, bool faydali) {
+  Widget itemViewer(String name, String gebelik) {
+    return Column(
+      children: [
+        Container(
+          height: 60,
+          width: double.infinity,
+          child: Row(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width * 0.2,
+                height: 60,
+                alignment: Alignment.center,
+                child: Container(
+                  width: 45,
+                  height: 45,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment(-0.95, 0.0),
+                        end: Alignment(1.0, 0.0),
+                        colors: [
+                          const Color(0xffC58BF2),
+                          const Color(0xffEEA4CE),
+                        ],
+                        stops: [0.0, 1.0],
+                      ),
+                      borderRadius: BorderRadius.circular(360)),
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        gebelik.substring(0, gebelik.indexOf(".")) + ".",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      Text(
+                        "Haf",
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                height: 60,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  name,
+                  style: TextStyle(fontSize: 18),
+                  maxLines: 2,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Divider(
+          thickness: 2,
+          indent: 10,
+          endIndent: 10,
+        )
+      ],
+    );
+  }
+
+  void bottomSheet(List<Viewer> viewerList) {
+    print(viewerList.length);
+    showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) {
+          return Container(
+              padding: EdgeInsets.only(top: 20),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(20))),
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(
+                        top: 10, left: 10, right: 20, bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Görüntüleyenler",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 20),
+                        ),
+                        GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Image.asset("images/bottom_close.png"))
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: viewerList.length,
+                      itemBuilder: (context, index) {
+                        return itemViewer(
+                            viewerList[index].name, viewerList[index].hafta);
+                      },
+                    ),
+                  ),
+                ],
+              ));
+        });
+  }
+
+  Widget itemVideo(VideoItem item) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            bottomSheet(item.viewerList);
+          },
+          child: Container(
+            height: 80,
+            width: double.infinity,
+            child: Row(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.2,
+                  height: 80,
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: 45,
+                    height: 45,
+                    alignment: Alignment.center,
+                    child: Image.asset("images/video_izlenme.png"),
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment(-0.95, 0.0),
+                          end: Alignment(1.0, 0.0),
+                          colors: [
+                            const Color(0xff92A3FD).withOpacity(0.2),
+                            const Color(0xff9DCEFF).withOpacity(0.2),
+                          ],
+                          stops: [0.0, 1.0],
+                        ),
+                        borderRadius: BorderRadius.circular(360)),
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: 80,
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        item.id + "-" + item.title,
+                        style: TextStyle(fontSize: 18),
+                        maxLines: 2,
+                      ),
+                      Text(
+                        item.view.toString() + " görüntülenme",
+                        style: TextStyle(color: Color(0xff7B6F72)),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Divider(
+          thickness: 2,
+        )
+      ],
+    );
+  }
+
+  Widget itemBildirim(
+      String title, String subtitle, String time, bool faydali) {
     return Container(
       height: 90,
       width: double.infinity,
@@ -620,7 +848,7 @@ class _ProfileState extends State<Profile> {
                     children: [
                       Spacer(),
                       Text(
-                        title,
+                        '"${title}" Değerlendirildi',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
@@ -653,6 +881,19 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+  Widget selected_2() {
+    return Container(
+        alignment: Alignment.center,
+        child: ListView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: widget.videoItemList.length,
+            itemBuilder: (context, index) {
+              return itemVideo(widget.videoItemList[index]);
+            }));
+  }
+
   Widget selected_1() {
     print(widget.bildirimList.length);
     return Container(
@@ -669,7 +910,7 @@ class _ProfileState extends State<Profile> {
               String faydali = widget.bildirimList[index].like
                   ? "videoyu faydalı buldu."
                   : "videoyu faydalı bulmadı.";
-              return item(
+              return itemBildirim(
                   widget.bildirimList[index].video,
                   widget.bildirimList[index].kisi + " " + faydali,
                   timeago.format(date, locale: 'tr'),
@@ -707,7 +948,11 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               widget.isUzman ? navigationBar() : Container(),
-              selected == 0 ? selected_0() : selected_1()
+              selected == 0
+                  ? selected_0()
+                  : selected == 1
+                      ? selected_1()
+                      : selected_2()
             ],
           ),
         ),

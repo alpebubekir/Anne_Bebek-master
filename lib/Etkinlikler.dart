@@ -14,24 +14,50 @@ class _EtkinliklerState extends State<Etkinlikler> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Container(),
-      ),
       body: widget.shouldShow
-          ? ListTile(
-              title: Text("Ankete git"),
-              leading: Icon(Icons.book),
-              trailing: Icon(Icons.arrow_forward_ios_rounded),
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (route) => Web(
-                          url:
-                              "https://docs.google.com/forms/d/e/1FAIpQLSdaXmfzW7G3RTrzBM7yHTTdpa0GNKZEb0kqXsCcGO7iEjfgIA/viewform"))),
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 40,
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Spacer(),
+                        Text(
+                          "Etkinlikler",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Spacer(),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: ListTile(
+                    title: Text("Ankete git"),
+                    leading: Icon(Icons.book),
+                    trailing: Icon(Icons.arrow_forward_ios_rounded),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (route) => Web(
+                                url:
+                                    "https://docs.google.com/forms/d/e/1FAIpQLSdaXmfzW7G3RTrzBM7yHTTdpa0GNKZEb0kqXsCcGO7iEjfgIA/viewform"))),
+                  ),
+                ),
+              ],
             )
           : Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(

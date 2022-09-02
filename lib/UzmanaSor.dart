@@ -215,24 +215,45 @@ class _UzmanaSorState extends State<UzmanaSor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomSheet: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(10),
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: TextField(
-              controller: textController,
-            ),
+      bottomSheet: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 70,
+        color: Colors.white,
+        padding: EdgeInsets.all(10),
+        child: Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Color(0xffE1E1E1))),
+                padding: EdgeInsets.only(left: 10),
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: TextField(
+                  controller: textController,
+                  decoration: InputDecoration(
+                      hintText: "Mesaj yaz",
+                      hintStyle: TextStyle(color: Color(0xffB1A7A7)),
+                      border: InputBorder.none),
+                ),
+              ),
+              Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(360),
+                      color: Colors.green),
+                  child: IconButton(
+                      onPressed: () {
+                        send();
+                      },
+                      icon: Icon(
+                        Icons.send,
+                        size: 20,
+                        color: Colors.white,
+                      )))
+            ],
           ),
-          Container(
-              padding: EdgeInsets.all(10),
-              width: MediaQuery.of(context).size.width * 0.2,
-              child: ElevatedButton(
-                  onPressed: () {
-                    send();
-                  },
-                  child: Icon(Icons.send)))
-        ],
+        ),
       ),
       appBar: AppBar(
         elevation: 0,

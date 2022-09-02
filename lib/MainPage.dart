@@ -16,7 +16,9 @@ import 'Uzman.dart';
 import 'VideoPage.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  const MainPage({Key? key, required this.videoItemList}) : super(key: key);
+
+  final List<VideoItem> videoItemList;
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -28,7 +30,6 @@ class _MainPageState extends State<MainPage> {
   var textController = TextEditingController();
 
   //List<Item> itemList = [];
-  List<VideoItem> videoItemList = [];
   List<Item> newsList = [];
   List<Person> personList = [];
 
@@ -67,7 +68,7 @@ class _MainPageState extends State<MainPage> {
     getName();
     getItems();
     getMakale();
-    getVideo();
+    //getVideo();
     getToken();
 
     FirebaseMessaging.instance.getInitialMessage();
@@ -137,24 +138,6 @@ class _MainPageState extends State<MainPage> {
         "Özge Karakaya Suzan", "Arş.Görevlisi", "Uzman Hemşire", 4.5));
     personList.add(Person("images/ozge_karakaya_suzan.png",
         "Özge Karakaya Suzan", "Arş.Görevlisi", "Uzman Hemşire", 4.6));
-  }
-
-  void getVideo() {
-    DatabaseReference ref = FirebaseDatabase.instance.ref("Videolar");
-
-    ref.onValue.listen((event) {
-      for (DataSnapshot snapshot in event.snapshot.children) {
-        videoItemList.add(VideoItem(
-            snapshot.key.toString(),
-            snapshot.child("title").value.toString(),
-            snapshot.child("link").value.toString(),
-            "images/video_banner.png",
-            snapshot.child("viewer").children.length,
-            snapshot.child("writer").value.toString(),
-            snapshot.child("appellation").value.toString()));
-      }
-      setState(() {});
-    });
   }
 
   void getMakale() {
@@ -322,7 +305,7 @@ class _MainPageState extends State<MainPage> {
         MaterialPageRoute(
             builder: (route) => VideoPage(
                   item: item,
-                  videoItemList: videoItemList,
+                  videoItemList: widget.videoItemList,
                 )));
   }
 
@@ -432,7 +415,7 @@ class _MainPageState extends State<MainPage> {
         }
       }
 
-      for (VideoItem v in videoItemList) {
+      for (VideoItem v in widget.videoItemList) {
         if ((v.title.toUpperCase().contains(text.toUpperCase()) ||
                 v.title.toLowerCase().contains(text.toLowerCase())) &&
             !videoFilterList.contains(v)) {
@@ -1172,7 +1155,7 @@ class _MainPageState extends State<MainPage> {
                   context,
                   MaterialPageRoute(
                       builder: (route) => Videolar(
-                            videoItemList: videoItemList,
+                            videoItemList: widget.videoItemList,
                           ))),
               child: Text(
                 "hepsi",
@@ -1190,16 +1173,22 @@ class _MainPageState extends State<MainPage> {
       Container(
         width: double.infinity,
         height: 230,
-        child: GridView.builder(
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          itemCount: videoItemList.length == 0 ? 0 : 3,
-          itemBuilder: (BuildContext context, int index) {
-            return videoItemWidget(videoItemList[index]);
-          },
-          gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
-        ),
+        child: widget.videoItemList.length == 0
+            ? Container(
+                alignment: Alignment.center,
+                width: 50,
+                height: 50,
+                child: CircularProgressIndicator())
+            : GridView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: widget.videoItemList.length == 0 ? 0 : 3,
+                itemBuilder: (BuildContext context, int index) {
+                  return videoItemWidget(widget.videoItemList[index]);
+                },
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1),
+              ),
       )
     ]);
   }
@@ -1305,9 +1294,16 @@ class Item {
 class VideoItem {
   final String title, videoUrl, photoUrl, writer, unvan, id;
   final int view;
+  final List<Viewer> viewerList;
 
   VideoItem(this.id, this.title, this.videoUrl, this.photoUrl, this.view,
-      this.writer, this.unvan);
+      this.writer, this.unvan, this.viewerList);
+}
+
+class Viewer {
+  final String hafta, name;
+
+  Viewer(this.hafta, this.name);
 }
 
 class Makale {

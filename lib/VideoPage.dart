@@ -219,69 +219,6 @@ class _VideoPageState extends State<VideoPage> {
     _controller.dispose();
   }
 
-  void goToViwers() {
-    if (FirebaseAuth.instance.currentUser!.uid ==
-            "ivkJYTY6fccl4LdGnYkxFCvUokL2" ||
-        FirebaseAuth.instance.currentUser!.uid ==
-            "z5MhoCKtOjV8yGfQfySRBfjdn1y1") {
-      DatabaseReference ref =
-          FirebaseDatabase.instance.ref("Videolar/" + widget.item.id);
-
-      ref.child("viewer").onValue.listen((event) async {
-        List<String> viewerList = [];
-        for (DataSnapshot snapshot in event.snapshot.children) {
-          viewerList.add(snapshot.value.toString());
-        }
-
-        await showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                content: Container(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Text(
-                              "Görüntüleyenler",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            alignment: Alignment.center,
-                          ),
-                          Container(
-                              width: MediaQuery.of(context).size.width * 0.1,
-                              alignment: Alignment.centerRight,
-                              child: IconButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                icon: Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                ),
-                              )),
-                        ],
-                      ),
-                      ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: viewerList.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text((index + 1).toString() +
-                                  "- " +
-                                  viewerList[index]),
-                            );
-                          })
-                    ],
-                  ),
-                ),
-              );
-            });
-      });
-    }
-  }
-
   Future<void> goToVideoPage(VideoItem item) async {
     DatabaseReference ref1 = FirebaseDatabase.instance
         .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
@@ -495,19 +432,16 @@ class _VideoPageState extends State<VideoPage> {
                 style: TextStyle(fontSize: 20),
               ),
             ),
-            GestureDetector(
-              onTap: goToViwers,
-              child: Container(
-                padding: EdgeInsets.only(left: 10, top: 30),
-                child: Row(
-                  children: [
-                    Image.asset("images/goz.png"),
-                    Text(
-                      "  " + widget.item.view.toString() + " görüntülenme",
-                      style: TextStyle(color: Colors.grey),
-                    )
-                  ],
-                ),
+            Container(
+              padding: EdgeInsets.only(left: 10, top: 30),
+              child: Row(
+                children: [
+                  Image.asset("images/goz.png"),
+                  Text(
+                    "  " + widget.item.view.toString() + " görüntülenme",
+                    style: TextStyle(color: Colors.grey),
+                  )
+                ],
               ),
             ),
             Container(

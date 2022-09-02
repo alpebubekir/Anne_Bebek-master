@@ -24,27 +24,77 @@ class _BottomNavigationState extends State<BottomNavigation> {
   int? kilo, boy, yas;
   bool shouldShow = false;
   List<Bildirim> bildirimList = [];
+  List<VideoItem> videoItemList = [];
   final List<Widget> widgetList = [
-    MainPage(),
+    MainPage(
+      videoItemList: [],
+    ),
     Etkinlikler(shouldShow: false),
     Uzmanlar(),
     Profile(
-        name: "",
-        surname: "",
-        kilo: null,
-        boy: null,
-        yas: null,
-        isUzman: false,
-        bildirimList: [])
+      name: "",
+      surname: "",
+      kilo: null,
+      boy: null,
+      yas: null,
+      isUzman: false,
+      bildirimList: [],
+      videoItemList: [],
+    )
   ];
   final PageStorageBucket bucket = PageStorageBucket();
-  Widget currentScreen = MainPage();
+  Widget currentScreen = MainPage(
+    videoItemList: [],
+  );
   bool isUzman = false;
   late String name = "", surname = "";
+
+  void getVideo() {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("Videolar");
+
+    ref.onValue.listen((event) async {
+      DatabaseReference refUser = FirebaseDatabase.instance.ref("Users");
+      for (DataSnapshot snapshot in event.snapshot.children) {
+        List<Viewer> viewerList = [];
+
+        for (DataSnapshot viewer in snapshot.child("viewer").children) {
+          String uid = viewer.key.toString();
+          var gebelik =
+              await refUser.child(uid).child("gebelik haftasi guncel").get();
+
+          viewerList
+              .add(Viewer(gebelik.value.toString(), viewer.value.toString()));
+        }
+
+        videoItemList.add(VideoItem(
+            snapshot.key.toString(),
+            snapshot.child("title").value.toString(),
+            snapshot.child("link").value.toString(),
+            "images/video_banner.png",
+            snapshot.child("viewer").children.length,
+            snapshot.child("writer").value.toString(),
+            snapshot.child("appellation").value.toString(),
+            viewerList));
+      }
+      currentScreen = MainPage(videoItemList: videoItemList);
+      widgetList[0] = currentScreen;
+      widgetList[3] = Profile(
+          name: name,
+          surname: surname,
+          kilo: kilo,
+          boy: boy,
+          yas: yas,
+          isUzman: isUzman,
+          bildirimList: bildirimList,
+          videoItemList: videoItemList);
+      setState(() {});
+    });
+  }
 
   @override
   void initState() {
     timeago.setLocaleMessages('tr', timeago.TrMessages());
+    getVideo();
     getData();
     getBildirim();
     super.initState();
@@ -155,6 +205,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       yas: yas,
       isUzman: isUzman,
       bildirimList: bildirimList,
+      videoItemList: videoItemList,
     );
 
     if (snapshot3.value.toString() == "36.hafta") {
@@ -180,6 +231,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       yas: yas,
       isUzman: isUzman,
       bildirimList: bildirimList,
+      videoItemList: videoItemList,
     );
     setState(() {});
   }
@@ -243,7 +295,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 onTap: () {
                   setState(() {
                     currentTab = 0;
-                    currentScreen = MainPage();
+                    currentScreen = MainPage(
+                      videoItemList: videoItemList,
+                    );
                   });
                 },
                 child: Column(
@@ -306,6 +360,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                       yas: yas,
                       isUzman: isUzman,
                       bildirimList: bildirimList,
+                      videoItemList: videoItemList,
                     );
                   });
                 },
