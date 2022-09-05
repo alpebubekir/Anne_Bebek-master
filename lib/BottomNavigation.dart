@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:anne_bebek/Etkinlikler.dart';
 import 'package:anne_bebek/MainPage.dart';
 import 'package:anne_bebek/Profile.dart';
@@ -21,10 +23,12 @@ class BottomNavigation extends StatefulWidget {
 
 class _BottomNavigationState extends State<BottomNavigation> {
   int currentTab = 0;
-  int? kilo, boy, yas;
+  int? yas;
+  double? kilo, boy;
   bool shouldShow = false;
   List<Bildirim> bildirimList = [];
   List<VideoItem> videoItemList = [];
+  List<AppUser> userList = [];
   final List<Widget> widgetList = [
     MainPage(
       videoItemList: [],
@@ -40,6 +44,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       isUzman: false,
       bildirimList: [],
       videoItemList: [],
+      userList: [],
     )
   ];
   final PageStorageBucket bucket = PageStorageBucket();
@@ -62,6 +67,10 @@ class _BottomNavigationState extends State<BottomNavigation> {
           var gebelik =
               await refUser.child(uid).child("gebelik haftasi guncel").get();
 
+          if (!gebelik.exists) {
+            gebelik = await refUser.child(uid).child("gebelik haftasi").get();
+          }
+
           viewerList
               .add(Viewer(gebelik.value.toString(), viewer.value.toString()));
         }
@@ -76,9 +85,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
             snapshot.child("appellation").value.toString(),
             viewerList));
       }
-      currentScreen = MainPage(videoItemList: videoItemList);
-      widgetList[0] = currentScreen;
-      widgetList[3] = Profile(
+
+      if (currentTab == 0) {
+        currentScreen = MainPage(videoItemList: videoItemList);
+      } else if (currentTab == 3) {
+        currentScreen = Profile(
           name: name,
           surname: surname,
           kilo: kilo,
@@ -86,7 +97,22 @@ class _BottomNavigationState extends State<BottomNavigation> {
           yas: yas,
           isUzman: isUzman,
           bildirimList: bildirimList,
-          videoItemList: videoItemList);
+          videoItemList: videoItemList,
+          userList: userList,
+        );
+      }
+      widgetList[0] = MainPage(videoItemList: videoItemList);
+      widgetList[3] = Profile(
+        name: name,
+        surname: surname,
+        kilo: kilo,
+        boy: boy,
+        yas: yas,
+        isUzman: isUzman,
+        bildirimList: bildirimList,
+        videoItemList: videoItemList,
+        userList: userList,
+      );
       setState(() {});
     });
   }
@@ -94,12 +120,64 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   void initState() {
     timeago.setLocaleMessages('tr', timeago.TrMessages());
+    getIsUzman();
+    if (isUzman) {
+      getUsers();
+    }
     getVideo();
     getData();
     getBildirim();
     super.initState();
-    getIsUzman();
     checkVersion();
+  }
+
+  void getUsers() {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("Users");
+
+    ref.onValue.listen((event) {
+      userList = [];
+      for (DataSnapshot snapshot in event.snapshot.children) {
+        int? yasUser;
+
+        yasUser = snapshot.child("dogum tarihi").value.toString() != ""
+            ? DateTime.now().year -
+                int.parse(snapshot
+                    .child("dogum tarihi")
+                    .value
+                    .toString()
+                    .substring(0, 4))
+            : null;
+
+        userList.add(AppUser(
+            snapshot.child("isim").value.toString(),
+            snapshot.child("soyisim").value.toString(),
+            snapshot.child("gebelik haftasi guncel").exists
+                ? snapshot.child("gebelik haftasi guncel").value.toString()
+                : snapshot.child("gebelik haftasi").value.toString() != ""
+                    ? snapshot.child("gebelik haftasi").value.toString()
+                    : null,
+            snapshot.child("creation").exists
+                ? DateTime.fromMillisecondsSinceEpoch(
+                    snapshot.child("creation").value as int)
+                : null,
+            yasUser,
+            snapshot.child("email").value.toString(),
+            snapshot.child("boy").value.toString() != ""
+                ? (snapshot.child("boy").value is int
+                    ? (snapshot.child("boy").value as int).toDouble()
+                    : snapshot.child("boy").value as double)
+                : null,
+            snapshot.child("kilo").value.toString() != ""
+                ? (snapshot.child("kilo").value is int
+                    ? (snapshot.child("kilo").value as int).toDouble()
+                    : snapshot.child("kilo").value as double)
+                : null,
+            snapshot.child("version").exists
+                ? snapshot.child("version").value.toString()
+                : null));
+      }
+      setState(() {});
+    });
   }
 
   Future<void> getBildirim() async {
@@ -140,8 +218,12 @@ class _BottomNavigationState extends State<BottomNavigation> {
     var boySnapshot = await ref.child("boy").get();
     var dogumSnapshot = await ref.child("dogum tarihi").get();
 
-    kilo = kiloSnapshot.value as int;
-    boy = boySnapshot.value as int;
+    kilo = kiloSnapshot.value is int
+        ? (kiloSnapshot.value as int).toDouble()
+        : kiloSnapshot.value as double;
+    boy = boySnapshot.value is int
+        ? (boySnapshot.value as int).toDouble()
+        : boySnapshot.value as double;
 
     yas = DateTime.now().year -
         int.parse(dogumSnapshot.value.toString().substring(0, 4));
@@ -161,10 +243,18 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
   Future<void> checkVersion() async {
     DatabaseReference ref = FirebaseDatabase.instance.ref("AppInfo");
+    DatabaseReference ref1 = FirebaseDatabase.instance
+        .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
 
     var snapshot = await ref.child("version").get();
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    if (Platform.isAndroid) {
+      ref1.update({"version": "Google Play " + packageInfo.version});
+    } else {
+      ref1.update({"version": "App Store " + packageInfo.version});
+    }
 
     if (snapshot.value.toString() != packageInfo.version) {
       await showDialog(
@@ -206,6 +296,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       isUzman: isUzman,
       bildirimList: bildirimList,
       videoItemList: videoItemList,
+      userList: userList,
     );
 
     if (snapshot3.value.toString() == "36.hafta") {
@@ -232,6 +323,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       isUzman: isUzman,
       bildirimList: bildirimList,
       videoItemList: videoItemList,
+      userList: userList,
     );
     setState(() {});
   }
@@ -361,6 +453,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                       isUzman: isUzman,
                       bildirimList: bildirimList,
                       videoItemList: videoItemList,
+                      userList: userList,
                     );
                   });
                 },
@@ -383,4 +476,15 @@ class _BottomNavigationState extends State<BottomNavigation> {
       ),
     );
   }
+}
+
+class AppUser {
+  final String name, surname, email;
+  final String? hafta, version;
+  final int? yas;
+  final double? boy, kilo;
+  final DateTime? creation;
+
+  AppUser(this.name, this.surname, this.hafta, this.creation, this.yas,
+      this.email, this.boy, this.kilo, this.version);
 }

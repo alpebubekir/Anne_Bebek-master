@@ -96,6 +96,11 @@ class _MainPageState extends State<MainPage> {
 
     DateTime creation =
         FirebaseAuth.instance.currentUser!.metadata.creationTime!;
+    var snapshotCreation = await ref.child("creation").get();
+
+    if (!snapshotCreation.exists) {
+      ref.update({"creation": creation.millisecondsSinceEpoch});
+    }
 
     String gebelik = snapshotgebelik.value.toString();
     int initial = int.parse(gebelik.substring(0, gebelik.indexOf(".")));

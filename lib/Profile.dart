@@ -1,5 +1,6 @@
 import 'package:anne_bebek/ChangePassword.dart';
 import 'package:anne_bebek/LogIn.dart';
+import 'package:anne_bebek/UserProfile.dart';
 import 'package:anne_bebek/Web.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_switch/flutter_switch.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'BottomNavigation.dart';
 import 'MainPage.dart';
 
 class Profile extends StatefulWidget {
@@ -20,14 +22,17 @@ class Profile extends StatefulWidget {
       required this.yas,
       required this.isUzman,
       required this.bildirimList,
-      required this.videoItemList})
+      required this.videoItemList,
+      required this.userList})
       : super(key: key);
 
   final String name, surname;
-  final int? kilo, boy, yas;
+  final int? yas;
+  final double? kilo, boy;
   final bool isUzman;
   final List<Bildirim> bildirimList;
   final List<VideoItem> videoItemList;
+  final List<AppUser> userList;
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -37,10 +42,47 @@ class _ProfileState extends State<Profile> {
   bool status = true;
   int selected = 0;
   String baslik = "Profil";
+  List<VideoItem> videoItemList = [];
 
   @override
   void initState() {
     super.initState();
+    videoItemList = widget.videoItemList;
+  }
+
+  Future<void> refreshVideo() async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("Videolar");
+
+    ref.onValue.listen((event) async {
+      videoItemList = [];
+      DatabaseReference refUser = FirebaseDatabase.instance.ref("Users");
+      for (DataSnapshot snapshot in event.snapshot.children) {
+        List<Viewer> viewerList = [];
+
+        for (DataSnapshot viewer in snapshot.child("viewer").children) {
+          String uid = viewer.key.toString();
+          var gebelik =
+              await refUser.child(uid).child("gebelik haftasi guncel").get();
+
+          if (!gebelik.exists) {
+            gebelik = await refUser.child(uid).child("gebelik haftasi").get();
+          }
+
+          viewerList
+              .add(Viewer(gebelik.value.toString(), viewer.value.toString()));
+        }
+
+        videoItemList.add(VideoItem(
+            snapshot.key.toString(),
+            snapshot.child("title").value.toString(),
+            snapshot.child("link").value.toString(),
+            "images/video_banner.png",
+            snapshot.child("viewer").children.length,
+            snapshot.child("writer").value.toString(),
+            snapshot.child("appellation").value.toString(),
+            viewerList));
+      }
+    });
   }
 
   Future<void> deleteAccount() async {
@@ -157,12 +199,12 @@ class _ProfileState extends State<Profile> {
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 5),
               alignment: Alignment.bottomCenter,
-              width: MediaQuery.of(context).size.width * 0.25,
+              width: MediaQuery.of(context).size.width * 0.19,
               child: Column(
                 children: [
                   Text(
                     "Profil",
-                    style: TextStyle(fontSize: 16, color: Color(0xff555B6A)),
+                    style: TextStyle(fontSize: 14, color: Color(0xff555B6A)),
                   ),
                   Container(
                     height: 4,
@@ -185,12 +227,12 @@ class _ProfileState extends State<Profile> {
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 5),
               alignment: Alignment.bottomCenter,
-              width: MediaQuery.of(context).size.width * 0.25,
+              width: MediaQuery.of(context).size.width * 0.19,
               child: Column(
                 children: [
                   Text(
                     "Log Yönetimi",
-                    style: TextStyle(fontSize: 16, color: Color(0xff555B6A)),
+                    style: TextStyle(fontSize: 14, color: Color(0xff555B6A)),
                   ),
                   Container(
                     height: 4,
@@ -213,12 +255,12 @@ class _ProfileState extends State<Profile> {
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 5),
               alignment: Alignment.bottomCenter,
-              width: MediaQuery.of(context).size.width * 0.25,
+              width: MediaQuery.of(context).size.width * 0.19,
               child: Column(
                 children: [
                   Text(
                     "Video İzlenme",
-                    style: TextStyle(fontSize: 16, color: Color(0xff555B6A)),
+                    style: TextStyle(fontSize: 14, color: Color(0xff555B6A)),
                   ),
                   Container(
                       height: 4,
@@ -231,9 +273,137 @@ class _ProfileState extends State<Profile> {
               ),
             ),
           ),
+          GestureDetector(
+            onTap: () {
+              selected = 3;
+              baslik = "Kullanıcılar";
+              setState(() {});
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 5),
+              alignment: Alignment.bottomCenter,
+              width: MediaQuery.of(context).size.width * 0.19,
+              child: Column(
+                children: [
+                  Text(
+                    "Kullanıcılar",
+                    style: TextStyle(fontSize: 14, color: Color(0xff555B6A)),
+                  ),
+                  Container(
+                      height: 4,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: selected == 3
+                              ? Color(0xffF28F8F)
+                              : Colors.transparent))
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  Widget itemUser(AppUser user) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => Navigator.push(context,
+          MaterialPageRoute(builder: (route) => UserProfile(user: user))),
+      child: Column(
+        children: [
+          Container(
+            height: 80,
+            width: double.infinity,
+            child: Row(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.2,
+                  height: 60,
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: 45,
+                    height: 45,
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          user.hafta == null
+                              ? "?"
+                              : user.hafta!
+                                      .substring(0, user.hafta!.indexOf(".")) +
+                                  ".",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                        Text(
+                          "Haf",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                      ],
+                    ),
+                    decoration: BoxDecoration(
+                        color: Colors.pink,
+                        borderRadius: BorderRadius.circular(360)),
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: 80,
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        user.name + " " + user.surname,
+                        style: TextStyle(fontSize: 18),
+                        maxLines: 2,
+                      ),
+                      Text(
+                        user.creation != null
+                            ? (user.creation!.day < 10 ? "0" : "") +
+                                user.creation!.day.toString() +
+                                "." +
+                                (user.creation!.month < 10 ? "0" : "") +
+                                user.creation!.month.toString() +
+                                "." +
+                                user.creation!.year.toString()
+                            : "",
+                        style: TextStyle(color: Color(0xff7B6F72)),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(
+            thickness: 2,
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget selected_3() {
+    return Container(
+        alignment: Alignment.center,
+        child: ListView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: widget.userList.length,
+            itemBuilder: (context, index) {
+              return itemUser(widget.userList[index]);
+            }));
   }
 
   Widget selected_0() {
@@ -245,36 +415,6 @@ class _ProfileState extends State<Profile> {
             leading: Image.asset("images/profile_girl.png"),
             title: Text(widget.name + " " + widget.surname),
             subtitle: Text("Uygulama katılımcısı"),
-            trailing: Container(
-              width: MediaQuery.of(context).size.width * 0.28,
-              height: 40,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment(-0.95, 0.0),
-                  end: Alignment(1.0, 0.0),
-                  colors: [
-                    const Color(0xff9DCEFF),
-                    const Color(0xff92A3FD),
-                  ],
-                  stops: [0.0, 1.0],
-                ),
-                borderRadius: BorderRadius.circular(80),
-              ),
-              child: ElevatedButton(
-                child: Text(
-                  "Düzenle",
-                  style: TextStyle(fontSize: 16),
-                ),
-                style: ButtonStyle(
-                    elevation: MaterialStateProperty.all(0),
-                    backgroundColor:
-                        MaterialStateProperty.all(Colors.transparent)),
-                onPressed: () {
-                  /*Navigator.push(context,
-                            MaterialPageRoute(builder: (route) => EditPage()));*/
-                },
-              ),
-            ),
           ),
         ),
         Padding(
@@ -302,7 +442,7 @@ class _ProfileState extends State<Profile> {
                   children: [
                     widget.boy != null
                         ? Text(
-                            widget.boy.toString() + "cm",
+                            widget.boy!.toInt().toString() + "cm",
                             style: TextStyle(
                                 color: Color(0xff92A3FD), fontSize: 18),
                           )
@@ -332,7 +472,7 @@ class _ProfileState extends State<Profile> {
                   children: [
                     widget.kilo != null
                         ? Text(
-                            widget.kilo.toString() + "kg",
+                            widget.kilo!.toInt().toString() + "kg",
                             style: TextStyle(
                                 color: Color(0xff92A3FD), fontSize: 18),
                           )
@@ -644,6 +784,7 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget itemViewer(String name, String gebelik) {
+    print("-------->" + name + " " + gebelik);
     return Column(
       children: [
         Container(
@@ -886,11 +1027,11 @@ class _ProfileState extends State<Profile> {
         alignment: Alignment.center,
         child: ListView.builder(
             shrinkWrap: true,
-            padding: EdgeInsets.zero,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: widget.videoItemList.length,
+            padding: EdgeInsets.zero,
+            itemCount: videoItemList.length,
             itemBuilder: (context, index) {
-              return itemVideo(widget.videoItemList[index]);
+              return itemVideo(videoItemList[index]);
             }));
   }
 
@@ -921,42 +1062,86 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 40,
-                ),
+      body: selected == 2
+          ? RefreshIndicator(
+              onRefresh: refreshVideo,
+              child: SingleChildScrollView(
                 child: Container(
-                  width: double.infinity,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
                     children: [
-                      Spacer(),
-                      Text(
-                        baslik,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 40,
+                        ),
+                        child: Container(
+                          width: double.infinity,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Spacer(),
+                              Text(
+                                baslik,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Spacer(),
+                            ],
+                          ),
                         ),
                       ),
-                      Spacer(),
+                      widget.isUzman ? navigationBar() : Container(),
+                      selected == 0
+                          ? selected_0()
+                          : selected == 1
+                              ? selected_1()
+                              : selected == 2
+                                  ? selected_2()
+                                  : selected_3()
                     ],
                   ),
                 ),
               ),
-              widget.isUzman ? navigationBar() : Container(),
-              selected == 0
-                  ? selected_0()
-                  : selected == 1
-                      ? selected_1()
-                      : selected_2()
-            ],
-          ),
-        ),
-      ),
+            )
+          : SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 40,
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Spacer(),
+                            Text(
+                              baslik,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Spacer(),
+                          ],
+                        ),
+                      ),
+                    ),
+                    widget.isUzman ? navigationBar() : Container(),
+                    selected == 0
+                        ? selected_0()
+                        : selected == 1
+                            ? selected_1()
+                            : selected == 2
+                                ? selected_2()
+                                : selected_3()
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }
