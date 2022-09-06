@@ -71,9 +71,28 @@ class _MainPageState extends State<MainPage> {
     //getVideo();
     getToken();
 
+    FirebaseMessaging.instance.subscribeToTopic("allusers");
+
     FirebaseMessaging.instance.getInitialMessage();
     FirebaseMessaging.onMessage.listen((event) {
       LocalNotificationService.display(event);
+      /*FlutterLocalNotificationsPlugin().show(
+          5,
+          event.notification!.title,
+          event.notification!.body,
+          NotificationDetails(
+              android: AndroidNotificationDetails("mychannel", "mychannel",
+                  importance: Importance.max, priority: Priority.high)));*/
+
+      print("------------>" + event.notification!.body!);
+
+      /*LocalNotificationService.display(RemoteMessage(
+          senderId: event.from,
+          notification: event.notification,
+          data: <String, dynamic>{
+            'title': event.notification!.title,
+            'body': event.notification!.body
+          }));*/
     });
 
     super.initState();

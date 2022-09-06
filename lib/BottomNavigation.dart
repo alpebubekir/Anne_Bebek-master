@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:anne_bebek/Etkinlikler.dart';
@@ -8,6 +9,7 @@ import 'package:anne_bebek/Uzmanlar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
@@ -281,6 +283,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
     DatabaseReference ref = FirebaseDatabase.instance
         .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
 
+    DatabaseReference refUzman =
+        FirebaseDatabase.instance.ref("Users/ivkJYTY6fccl4LdGnYkxFCvUokL2");
+
     var snapshot1 = await ref.child("isim").get();
     var snapshot2 = await ref.child("soyisim").get();
     var snapshot3 = await ref.child("gebelik haftasi guncel").get();
@@ -300,10 +305,57 @@ class _BottomNavigationState extends State<BottomNavigation> {
     );
 
     if (snapshot3.value.toString() == "36.hafta") {
+      var snapshotBildirim = await ref.child("36haftaBildirim").get();
+
       widgetList[1] = Etkinlikler(shouldShow: true);
       shouldShow = true;
+
+      if (!snapshotBildirim.exists) {
+        var snapshotToken = await refUzman.child("token").get();
+
+        sendNotification(snapshotToken.value.toString());
+      }
     }
     setState(() {});
+  }
+
+  sendNotification(String token) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '36',
+      'status': 'done',
+      'message': "${name} ${surname} 36. gebelik haftasına girmiştir.",
+    };
+
+    try {
+      http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'key=AAAABjSZRmg:APA91bHtoJHoE-syEJV-VWJO52mEaEUuBUCykmyrq8nojd_2WKNGPK3gA85p_AbKsM9AzuGLl-LjlcoJiyB-oG9UsExyOn5VEU50ktJ5yQWxqeJVb12ZAk_OrVm6MJegUzlZe-WknnF0'
+              },
+              body: jsonEncode(<String, dynamic>{
+                'notification': <String, dynamic>{
+                  'body': "${name} ${surname} 36. gebelik haftasına girmiştir.",
+                  'title':
+                      "${name} ${surname} 36. gebelik haftasına girmiştir.",
+                },
+                'priority': 'high',
+                'data': data,
+                'to': '$token'
+              }));
+
+      if (response.statusCode == 200) {
+        print("Yeh notificatin is sended");
+
+        DatabaseReference ref = FirebaseDatabase.instance
+            .ref("Users/" + FirebaseAuth.instance.currentUser!.uid);
+        ref.update({"36haftaBildirim": true});
+      } else {
+        print("Error");
+      }
+    } catch (e) {}
   }
 
   void getIsUzman() {

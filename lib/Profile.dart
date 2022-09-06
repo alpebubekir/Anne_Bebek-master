@@ -82,6 +82,7 @@ class _ProfileState extends State<Profile> {
             snapshot.child("appellation").value.toString(),
             viewerList));
       }
+      setState(() {});
     });
   }
 
@@ -172,7 +173,7 @@ class _ProfileState extends State<Profile> {
               padding: const EdgeInsets.only(left: 20),
               child: Text(
                 title,
-                style: TextStyle(fontSize: 20, color: Color(0xff7B6F72)),
+                style: TextStyle(fontSize: 18, color: Color(0xff7B6F72)),
               ),
             ),
             Spacer(),
@@ -533,7 +534,7 @@ class _ProfileState extends State<Profile> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Hesap",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               Padding(
@@ -595,7 +596,7 @@ class _ProfileState extends State<Profile> {
                         child: Text(
                           "Çıkış yap",
                           style:
-                              TextStyle(fontSize: 20, color: Color(0xff7B6F72)),
+                              TextStyle(fontSize: 18, color: Color(0xff7B6F72)),
                         ),
                       ),
                       Spacer(),
@@ -622,7 +623,7 @@ class _ProfileState extends State<Profile> {
                         child: Text(
                           "Hesabımı sil",
                           style:
-                              TextStyle(fontSize: 20, color: Color(0xff7B6F72)),
+                              TextStyle(fontSize: 18, color: Color(0xff7B6F72)),
                         ),
                       ),
                       Spacer(),
@@ -652,7 +653,7 @@ class _ProfileState extends State<Profile> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Bildirimler",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               Padding(
@@ -672,11 +673,13 @@ class _ProfileState extends State<Profile> {
                         child: Text(
                           "Bildirim Gönder",
                           style:
-                              TextStyle(fontSize: 20, color: Color(0xff7B6F72)),
+                              TextStyle(fontSize: 18, color: Color(0xff7B6F72)),
                         ),
                       ),
                       Spacer(),
                       Container(
+                        width: 50,
+                        height: 25,
                         decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment(-0.95, 0.0),
@@ -711,6 +714,17 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
               ),
+              /*widget.isUzman
+                  ? hesapItem(
+                      Image.asset(
+                        "images/icon_notify.png",
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.cover,
+                      ),
+                      "Bildirim ayarla",
+                      PushNotification())
+                  : Container()*/
             ],
           ),
         ),
@@ -732,7 +746,7 @@ class _ProfileState extends State<Profile> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Yetkili İletişim",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               Padding(

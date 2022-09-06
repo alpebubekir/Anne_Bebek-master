@@ -399,6 +399,12 @@ class _VideoPageState extends State<VideoPage> {
                           child: CircularProgressIndicator(),
                         ),
                   Container(
+                    child: VideoProgressIndicator(
+                      _controller,
+                      allowScrubbing: true,
+                    ),
+                  ),
+                  Container(
                     color: Color(0xff92a3fd),
                     width: double.infinity,
                     height: 50,
