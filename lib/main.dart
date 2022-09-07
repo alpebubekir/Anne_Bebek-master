@@ -68,21 +68,6 @@ class _MyAppState extends State<MyApp> {
       } else {
         moreInformation = false;
       }
-
-      var snapshot1 = await ref.child("gebelik haftasi").get();
-      DateTime creation =
-          FirebaseAuth.instance.currentUser!.metadata.creationTime!;
-
-      String gebelik = snapshot1.value.toString();
-      int initial = int.parse(gebelik.substring(0, gebelik.indexOf(".")));
-
-      var fark = DateTime.now().difference(creation);
-
-      int haftaFark = (fark.inDays / 7).toInt();
-
-      int guncel = initial + haftaFark > 36 ? 36 : initial + haftaFark;
-
-      ref.update({"gebelik haftasi guncel": "${guncel}.hafta"});
     } else {
       moreInformation = false;
     }

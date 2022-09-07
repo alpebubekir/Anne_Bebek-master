@@ -66,12 +66,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
         for (DataSnapshot viewer in snapshot.child("viewer").children) {
           String uid = viewer.key.toString();
-          var gebelik =
-              await refUser.child(uid).child("gebelik haftasi guncel").get();
-
-          if (!gebelik.exists) {
-            gebelik = await refUser.child(uid).child("gebelik haftasi").get();
-          }
+          var gebelik = await refUser.child(uid).child("gebelik haftasi").get();
 
           viewerList
               .add(Viewer(gebelik.value.toString(), viewer.value.toString()));
@@ -119,8 +114,44 @@ class _BottomNavigationState extends State<BottomNavigation> {
     });
   }
 
+  Future<void> haftaArttir() async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("AppInfo");
+    DatabaseReference refUsers = FirebaseDatabase.instance.ref("Users");
+    bool first = true;
+    var date = DateTime.now();
+    if (date.weekday == DateTime.monday) {
+      String dateString = date.year.toString() +
+          " " +
+          date.month.toString() +
+          " " +
+          date.day.toString();
+
+      refUsers.onValue.listen((event) async {
+        var snapshot = await ref.child("updates").child(dateString).get();
+        if (!snapshot.exists && first) {
+          for (DataSnapshot user in event.snapshot.children) {
+            var gebelik = await user.child("gebelik haftasi").ref.get();
+
+            if (gebelik.value.toString() != "") {
+              int hafta = int.parse(gebelik.value
+                  .toString()
+                  .substring(0, gebelik.value.toString().indexOf(".")));
+
+              first = false;
+              user.ref.update(
+                  {"gebelik haftasi": "${hafta + 1}.hafta"}).whenComplete(() {
+                ref.child("updates").update({dateString: ""});
+              });
+            }
+          }
+        }
+      });
+    }
+  }
+
   @override
   void initState() {
+    haftaArttir();
     timeago.setLocaleMessages('tr', timeago.TrMessages());
     getIsUzman();
     if (isUzman) {
@@ -153,11 +184,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
         userList.add(AppUser(
             snapshot.child("isim").value.toString(),
             snapshot.child("soyisim").value.toString(),
-            snapshot.child("gebelik haftasi guncel").exists
-                ? snapshot.child("gebelik haftasi guncel").value.toString()
-                : snapshot.child("gebelik haftasi").value.toString() != ""
-                    ? snapshot.child("gebelik haftasi").value.toString()
-                    : null,
+            snapshot.child("gebelik haftasi").value.toString() != ""
+                ? snapshot.child("gebelik haftasi").value.toString()
+                : null,
             snapshot.child("creation").exists
                 ? DateTime.fromMillisecondsSinceEpoch(
                     snapshot.child("creation").value as int)
@@ -288,7 +317,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
     var snapshot1 = await ref.child("isim").get();
     var snapshot2 = await ref.child("soyisim").get();
-    var snapshot3 = await ref.child("gebelik haftasi guncel").get();
+    var snapshot3 = await ref.child("gebelik haftasi").get();
 
     name = snapshot1.value.toString();
     surname = snapshot2.value.toString();

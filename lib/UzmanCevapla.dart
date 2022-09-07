@@ -79,15 +79,7 @@ class _UzmanCevaplaState extends State<UzmanCevapla> {
                   uid,
                   event.snapshot.child("isim").value.toString(),
                   event.snapshot.child("soyisim").value.toString(),
-                  event.snapshot.child("gebelik haftasi guncel").exists
-                      ? event.snapshot
-                          .child("gebelik haftasi guncel")
-                          .value
-                          .toString()
-                      : event.snapshot
-                          .child("gebelik haftasi")
-                          .value
-                          .toString(),
+                  event.snapshot.child("gebelik haftasi").value.toString(),
                   event.snapshot.child("email").value.toString(),
                   mesajlar,
                   event.snapshot.child("timestamp").value == null

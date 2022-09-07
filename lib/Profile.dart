@@ -61,12 +61,7 @@ class _ProfileState extends State<Profile> {
 
         for (DataSnapshot viewer in snapshot.child("viewer").children) {
           String uid = viewer.key.toString();
-          var gebelik =
-              await refUser.child(uid).child("gebelik haftasi guncel").get();
-
-          if (!gebelik.exists) {
-            gebelik = await refUser.child(uid).child("gebelik haftasi").get();
-          }
+          var gebelik = await refUser.child(uid).child("gebelik haftasi").get();
 
           viewerList
               .add(Viewer(gebelik.value.toString(), viewer.value.toString()));
@@ -829,7 +824,9 @@ class _ProfileState extends State<Profile> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        gebelik.substring(0, gebelik.indexOf(".")) + ".",
+                        gebelik == "?"
+                            ? "?"
+                            : gebelik.substring(0, gebelik.indexOf(".")) + ".",
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

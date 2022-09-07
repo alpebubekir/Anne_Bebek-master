@@ -122,16 +122,10 @@ class _MainPageState extends State<MainPage> {
     }
 
     String gebelik = snapshotgebelik.value.toString();
-    int initial = int.parse(gebelik.substring(0, gebelik.indexOf(".")));
-
-    var fark = DateTime.now().difference(creation);
-
-    int haftaFark = (fark.inDays / 7).toInt();
-
-    int guncel = initial + haftaFark > 36 ? 36 : initial + haftaFark;
+    int hafta = int.parse(gebelik.substring(0, gebelik.indexOf(".")));
 
     DateTime date =
-        DateTime.now().add(Duration(days: (36 - guncel) * 7, minutes: 15));
+        DateTime.now().add(Duration(days: (36 - hafta) * 7, minutes: 15));
 
     FlutterLocalNotificationsPlugin fl = FlutterLocalNotificationsPlugin();
     var android = AndroidNotificationDetails("mychannel", "mychannel",
