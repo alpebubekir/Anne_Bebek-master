@@ -287,7 +287,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
       ref1.update({"version": "App Store " + packageInfo.version});
     }
 
-    if (snapshot.value.toString() != packageInfo.version) {
+    if (snapshot.value.toString() != packageInfo.version &&
+        Platform.isAndroid) {
       await showDialog(
         barrierDismissible: false,
         context: context,

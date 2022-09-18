@@ -36,7 +36,7 @@ class _SignUpState extends State<SignUp> {
             context,
             MaterialPageRoute(
                 builder: (route) =>
-                    Web(url: "http://cetinkaraca.com.tr/kvkk.html")));
+                    Web(url: "https://cetinkaraca.com.tr/kvkk.html")));
       };
     tapGestureRecognizer1 = TapGestureRecognizer()
       ..onTap = () {
@@ -45,7 +45,7 @@ class _SignUpState extends State<SignUp> {
             MaterialPageRoute(
                 builder: (route) => Web(
                     url:
-                        "http://cetinkaraca.com.tr/tibbi-sorumluluk-reddi.html")));
+                        "https://cetinkaraca.com.tr/tibbi-sorumluluk-reddi.html")));
       };
   }
 

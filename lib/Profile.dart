@@ -542,7 +542,7 @@ class _ProfileState extends State<Profile> {
                       fit: BoxFit.cover,
                     ),
                     "Kişisel Veri",
-                    Web(url: "http://cetinkaraca.com.tr/kvkk.html")),
+                    Web(url: "https://cetinkaraca.com.tr/kvkk.html")),
               ),
               hesapItem(
                   Image.asset(
