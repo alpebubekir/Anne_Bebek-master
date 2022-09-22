@@ -2,6 +2,8 @@ import 'package:anne_bebek/SoruCevapla.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
+import 'TopluMesaj.dart';
+
 class UzmanCevapla extends StatefulWidget {
   const UzmanCevapla({Key? key}) : super(key: key);
 
@@ -79,7 +81,12 @@ class _UzmanCevaplaState extends State<UzmanCevapla> {
                   uid,
                   event.snapshot.child("isim").value.toString(),
                   event.snapshot.child("soyisim").value.toString(),
-                  event.snapshot.child("gebelik haftasi").value.toString(),
+                  event.snapshot.child("gebelik haftasi").value.toString() == ""
+                      ? "?"
+                      : event.snapshot
+                          .child("gebelik haftasi")
+                          .value
+                          .toString(),
                   event.snapshot.child("email").value.toString(),
                   mesajlar,
                   event.snapshot.child("timestamp").value == null
@@ -154,9 +161,11 @@ class _UzmanCevaplaState extends State<UzmanCevapla> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      item.gebelikHaftasi
-                              .substring(0, item.gebelikHaftasi.indexOf(".")) +
-                          ".",
+                      item.gebelikHaftasi == "?"
+                          ? "?"
+                          : item.gebelikHaftasi.substring(
+                                  0, item.gebelikHaftasi.indexOf(".")) +
+                              ".",
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -295,6 +304,18 @@ class _UzmanCevaplaState extends State<UzmanCevapla> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.pink)),
+                  onPressed: () => Navigator.push(
+                      context, MaterialPageRoute(builder: (c) => TopluMesaj())),
+                  child: Row(
+                    children: [Icon(Icons.add), Text("Toplu mesaj gönder")],
                   ),
                 ),
               ),

@@ -61,10 +61,13 @@ class _ProfileState extends State<Profile> {
 
         for (DataSnapshot viewer in snapshot.child("viewer").children) {
           String uid = viewer.key.toString();
-          var gebelik = await refUser.child(uid).child("gebelik haftasi").get();
+          var gebelik = await refUser
+              .child(uid)
+              .child("gebelik haftasi")
+              .once(DatabaseEventType.value);
 
-          viewerList
-              .add(Viewer(gebelik.value.toString(), viewer.value.toString()));
+          viewerList.add(Viewer(
+              gebelik.snapshot.value!.toString(), viewer.value.toString()));
         }
 
         videoItemList.add(VideoItem(
@@ -391,15 +394,16 @@ class _ProfileState extends State<Profile> {
 
   Widget selected_3() {
     return Container(
-        alignment: Alignment.center,
-        child: ListView.builder(
-            shrinkWrap: true,
-            padding: EdgeInsets.zero,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: widget.userList.length,
-            itemBuilder: (context, index) {
-              return itemUser(widget.userList[index]);
-            }));
+      alignment: Alignment.center,
+      child: ListView.builder(
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: widget.userList.length,
+          itemBuilder: (context, index) {
+            return itemUser(widget.userList[index]);
+          }),
+    );
   }
 
   Widget selected_0() {
@@ -542,7 +546,7 @@ class _ProfileState extends State<Profile> {
                       fit: BoxFit.cover,
                     ),
                     "Kişisel Veri",
-                    Web(url: "https://cetinkaraca.com.tr/kvkk.html")),
+                    Web(url: "http://cetinkaraca.com.tr/kvkk.html")),
               ),
               hesapItem(
                   Image.asset(
